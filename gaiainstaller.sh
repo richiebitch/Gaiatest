@@ -4,6 +4,8 @@
 if ! command -v screen &> /dev/null; then
     echo "❌ Screen is not installed. Installing screen..."
     sudo apt-get install -y screen
+    sudo apt update
+    sudo apt install net-tools
 else
     echo "✅ Screen is already installed."
 fi
@@ -213,7 +215,7 @@ while true; do
 
         7)
             echo "Restarting GaiaNet Node..."
-            sudo kill -9 $(lsof -t -i :8080)
+            sudo netstat -tulnp | grep :8080
             gaianet stop
             gaianet init
             gaianet start
