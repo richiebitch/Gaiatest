@@ -185,7 +185,7 @@ generate_random_general_question() {
             "What do you wear on your head when riding a bike?"
             "What do you do when you hear music?"
         )
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "Who is the current President of the United States?"
             "What is the capital of Japan?"
@@ -466,7 +466,7 @@ EOF
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
         sleep 2
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ No sleep for gadao API..."
         sleep 0
     fi
