@@ -173,5 +173,6 @@ echo "🚀 Starting GaiaNet node..."
 
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
+
 # Closing message
 echo "🎉 Setup and initialization complete! Your GaiaNet node should now be running."
