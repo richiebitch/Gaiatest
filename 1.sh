@@ -88,24 +88,24 @@ get_cuda_version() {
 
         if [[ "$CUDA_VERSION" == "11" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda 11..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 11
+            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda 12
         elif [[ "$CUDA_VERSION" == "12" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda 12..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 12
+            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda 12
         else
             echo "⚠️ Unsupported CUDA version detected. Installing GaiaNet without GPU support..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
         fi
     else
         echo "⚠️ CUDA not found. Installing GaiaNet without GPU support..."
-        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
+        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
     fi
 }
 
 # Function to install GaiaNet without GPU support
 install_gaianet_no_gpu() {
     echo "📥 Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
 }
 
 # Function to add GaiaNet to PATH
