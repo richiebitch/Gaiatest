@@ -148,7 +148,7 @@ while true; do
             fi
 
             # Check if GaiaNet is installed properly
-            gaianet_info=$(~/gaianet/bin/gaianet info 2>/dev/null)
+            gaianet_info=$( ~/gaianet/bin/gaianet info 2>/dev/null )
             if [[ -z "$gaianet_info" ]]; then
                 echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
                 echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
