@@ -50,7 +50,7 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
             API_NAME="GaCrypto"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
