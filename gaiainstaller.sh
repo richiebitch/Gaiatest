@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Check if sudo is installed
+if ! command -v sudo &> /dev/null; then
+    echo "❌ sudo is not installed. Installing sudo..."
+    apt update
+    apt install -y sudo
+else
+    echo "✅ sudo is already installed."
+fi
+
 # Check if screen is installed
 if ! command -v screen &> /dev/null; then
     echo "❌ Screen is not installed. Installing screen..."
