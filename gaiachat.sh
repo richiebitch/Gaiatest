@@ -133,6 +133,7 @@ general_questions=(
     "Who wrote 'The Republic'?"
     "Who discovered the proton?"
 )
+    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "Who is the current President of the United States?"
             "What is the capital of Japan?"
