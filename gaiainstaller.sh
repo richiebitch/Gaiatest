@@ -251,7 +251,7 @@ while true; do
             if [[ "$confirm" == "y" ]]; then
                 echo "🗑️ Uninstalling GaiaNet Node..."
                 curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/uninstall.sh' | bash
-                source /root/.bashrc
+                sudo source /root/.bashrc
             else
                 echo "Uninstallation aborted."
             fi
