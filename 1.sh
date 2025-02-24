@@ -39,22 +39,33 @@ check_system_type() {
     fi
 }
 
-# Install CUDA Toolkit 12.8
+# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
-    echo "🖥️ Installing CUDA..."
     if $IS_WSL; then
-        CUDA_REPO="https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64"
-        CUDA_DEB="cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb"
-        wget $CUDA_REPO/cuda-wsl-ubuntu.pin
-        sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        echo "🖥️ Installing CUDA for WSL 2..."
+        # Download and set up the CUDA repository for WSL
+        wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin || { echo "❌ Failed to download cuda-wsl-ubuntu.pin"; exit 1; }
+        sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600 || { echo "❌ Failed to move cuda-wsl-ubuntu.pin"; exit 1; }
+        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb || { echo "❌ Failed to download CUDA .deb for WSL"; exit 1; }
+        sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb || { echo "❌ Failed to install CUDA .deb for WSL"; exit 1; }
+        sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/ || { echo "❌ Failed to copy CUDA keyring"; exit 1; }
     else
-        CUDA_REPO="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64"
-        CUDA_DEB="cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb"
+        echo "🖥️ Installing CUDA for Ubuntu 24.04..."
+        # Download and set up the CUDA repository for Ubuntu 24.04
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin || { echo "❌ Failed to download cuda-ubuntu2404.pin"; exit 1; }
+        sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600 || { echo "❌ Failed to move cuda-ubuntu2404.pin"; exit 1; }
+        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb || { echo "❌ Failed to download CUDA .deb for Ubuntu 24.04"; exit 1; }
+        sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb || { echo "❌ Failed to install CUDA .deb for Ubuntu 24.04"; exit 1; }
+        sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/ || { echo "❌ Failed to copy CUDA keyring"; exit 1; }
     fi
 
-    wget $CUDA_REPO/$CUDA_DEB && sudo dpkg -i $CUDA_DEB && sudo cp /var/cuda-repo*/cuda-*-keyring.gpg /usr/share/keyrings/
-    sudo apt-get update && sudo apt-get -y install cuda-toolkit-12-8 || { echo "❌ CUDA installation failed."; exit 1; }
-    echo "✅ CUDA installed successfully."
+    # Update the package list and install CUDA Toolkit 12.8
+    echo "🔄 Updating package list..."
+    sudo apt-get update || { echo "❌ Failed to update package list"; exit 1; }
+    echo "🔧 Installing CUDA Toolkit 12.8..."
+    sudo apt-get install -y cuda-toolkit-12-8 || { echo "❌ Failed to install CUDA Toolkit 12.8"; exit 1; }
+
+    echo "✅ CUDA Toolkit 12.8 installed successfully."
     setup_cuda_env
 }
 
