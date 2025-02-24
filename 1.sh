@@ -2,7 +2,7 @@
 
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
-sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config
+sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
 
 # Detect if running inside WSL
 IS_WSL=false
@@ -73,12 +73,14 @@ install_gaianet() {
         echo "✅ CUDA version detected: $CUDA_VERSION"
         if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
-            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda $CUDA_VERSION
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' -o install.sh
+            chmod +x install.sh
+            ./install.sh --ggmlcuda $CUDA_VERSION || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
             return
         fi
     fi
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
 }
 
 # Add GaiaNet to PATH
@@ -137,6 +139,5 @@ echo "🚀 Starting GaiaNet node..."
 
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
-
 # Closing message
 echo "🎉 Setup and initialization complete! Your GaiaNet node should now be running."
