@@ -140,7 +140,7 @@ while true; do
             echo "Detecting system configuration..."
 
             # Check if GaiaNet is installed
-            if ! command -v gaianet &> /dev/null; then
+            if ! command -v ~/gaianet/bin/gaianet &> /dev/null; then
                 echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
                 echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
                 read -rp "Press Enter to return to the main menu..."
@@ -148,7 +148,7 @@ while true; do
             fi
 
             # Check if GaiaNet is installed properly
-            gaianet_info=$(gaianet info 2>/dev/null)
+            gaianet_info=$(~/gaianet/bin/gaianet info 2>/dev/null)
             if [[ -z "$gaianet_info" ]]; then
                 echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
                 echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
