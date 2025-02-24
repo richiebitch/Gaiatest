@@ -2,8 +2,7 @@
 
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
-sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget
-sudo apt update && sudo apt install -y build-essential libglvnd-dev pkg-config
+sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config
 
 # Detect if running inside WSL
 IS_WSL=false
@@ -14,13 +13,10 @@ else
     echo "🖥️ Running on a native Ubuntu system."
 fi
 
-# Function to check if an NVIDIA GPU is present
+# Check if an NVIDIA GPU is present
 check_nvidia_gpu() {
-    if command -v nvidia-smi &> /dev/null; then
+    if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
         echo "✅ NVIDIA GPU detected."
-        return 0
-    elif lspci | grep -i nvidia &> /dev/null; then
-        echo "✅ NVIDIA GPU detected (via lspci)."
         return 0
     else
         echo "⚠️ No NVIDIA GPU found."
@@ -28,7 +24,7 @@ check_nvidia_gpu() {
     fi
 }
 
-# Function to check if the system is a VPS, Laptop, or Desktop
+# Check if the system is a VPS, Laptop, or Desktop
 check_system_type() {
     vps_type=$(systemd-detect-virt)
     if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
@@ -43,36 +39,26 @@ check_system_type() {
     fi
 }
 
-# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
+# Install CUDA Toolkit 12.8
 install_cuda() {
+    echo "🖥️ Installing CUDA..."
     if $IS_WSL; then
-        echo "🖥️ Installing CUDA for WSL 2..."
-        wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+        CUDA_REPO="https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64"
+        CUDA_DEB="cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb"
+        wget $CUDA_REPO/cuda-wsl-ubuntu.pin
         sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
-        sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
-        sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     else
-        echo "🖥️ Installing CUDA for Ubuntu 24.04..."
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
-        sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-        sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-        sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+        CUDA_REPO="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64"
+        CUDA_DEB="cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb"
     fi
 
-    sudo apt-get update
-    sudo apt-get -y install cuda-toolkit-12-8
-    if [ $? -eq 0 ]; then
-        echo "✅ CUDA installed successfully."
-        setup_cuda_env
-    else
-        echo "❌ CUDA installation failed."
-        return 1
-    fi
+    wget $CUDA_REPO/$CUDA_DEB && sudo dpkg -i $CUDA_DEB && sudo cp /var/cuda-repo*/cuda-*-keyring.gpg /usr/share/keyrings/
+    sudo apt-get update && sudo apt-get -y install cuda-toolkit-12-8 || { echo "❌ CUDA installation failed."; exit 1; }
+    echo "✅ CUDA installed successfully."
+    setup_cuda_env
 }
 
-# Function to set up CUDA environment variables
+# Set up CUDA environment variables
 setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
     echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
@@ -80,35 +66,22 @@ setup_cuda_env() {
     source ~/.bashrc
 }
 
-# Function to check CUDA version and install GaiaNet accordingly
-get_cuda_version() {
+# Install GaiaNet with appropriate CUDA support
+install_gaianet() {
     if command -v nvcc &> /dev/null; then
         CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
-
-        if [[ "$CUDA_VERSION" == "11" ]]; then
-            echo "🔧 Installing GaiaNet with ggmlcuda 11..."
-            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda 12
-        elif [[ "$CUDA_VERSION" == "12" ]]; then
-            echo "🔧 Installing GaiaNet with ggmlcuda 12..."
-            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda 12
-        else
-            echo "⚠️ Unsupported CUDA version detected. Installing GaiaNet without GPU support..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
+        if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
+            echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
+            curl -sSf https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh | bash -s -- --ggmlcuda $CUDA_VERSION
+            return
         fi
-    else
-        echo "⚠️ CUDA not found. Installing GaiaNet without GPU support..."
-        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
     fi
-}
-
-# Function to install GaiaNet without GPU support
-install_gaianet_no_gpu() {
-    echo "📥 Installing GaiaNet without GPU support..."
+    echo "⚠️ Installing GaiaNet without GPU support..."
     curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash
 }
 
-# Function to add GaiaNet to PATH
+# Add GaiaNet to PATH
 add_gaianet_to_path() {
     echo 'export PATH=$HOME/gaianet/bin:$PATH' >> ~/.bashrc
     source ~/.bashrc
@@ -116,16 +89,10 @@ add_gaianet_to_path() {
 
 # Main logic
 if check_nvidia_gpu; then
-    echo "🖥️ NVIDIA GPU detected. Checking CUDA version..."
-    if install_cuda; then
-        get_cuda_version
-    else
-        echo "❌ CUDA installation failed. Installing GaiaNet without GPU support..."
-        install_gaianet_no_gpu
-    fi
+    install_cuda
+    install_gaianet
 else
-    echo "🖥️ No NVIDIA GPU detected. Installing GaiaNet without GPU support..."
-    install_gaianet_no_gpu
+    install_gaianet
 fi
 
 # Verify GaiaNet installation
@@ -160,16 +127,14 @@ elif [[ $SYSTEM_TYPE -eq 2 ]]; then
     fi
 fi
 
-# Initialize GaiaNet with the appropriate configuration
+# Initialize and start GaiaNet
 echo "⚙️ Initializing GaiaNet..."
 ~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
-# Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
 ~/gaianet/bin/gaianet config --domain gaia.domains
 ~/gaianet/bin/gaianet start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
-# Fetch GaiaNet node information
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 
