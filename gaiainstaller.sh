@@ -213,10 +213,7 @@ while true; do
 
         7)
             echo "Restarting GaiaNet Node..."
-            gaianet stop
-            gaianet init
-            gaianet start
-            gaianet info
+            sudo lsof -i :8080 && gaianet stop && gaianet init && gaianet start && gaianet info
             ;;
 
         8)
