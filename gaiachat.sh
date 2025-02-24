@@ -81,7 +81,7 @@ fi
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-general_questions = (
+general_questions=(
     "What is the capital of France?"
     "Who wrote 'Romeo and Juliet'?"
     "What is the largest planet in the solar system?"
