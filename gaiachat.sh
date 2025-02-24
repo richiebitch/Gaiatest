@@ -81,56 +81,56 @@ fi
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        general_questions = (
-    "What is the capital of France?",
-    "Who wrote 'Romeo and Juliet'?",
-    "What is the largest planet in the solar system?",
-    "What is the chemical symbol for water?",
-    "Who painted the Mona Lisa?",
-    "What is the smallest prime number?",
-    "What is the square root of 64?",
-    "What is the currency of Japan?",
-    "Who invented the telephone?",
-    "What is the longest river in the world?",
-    "What is the freezing point of water in Celsius?",
-    "What is the main gas found in Earth's atmosphere?",
-    "Who was the first president of the United States?",
-    "What is the capital of Australia?",
-    "What is the largest mammal in the world?",
-    "What is the chemical symbol for gold?",
-    "Who discovered gravity?",
-    "What is the capital of Canada?",
-    "What is the smallest continent by land area?",
-    "What is the capital of Italy?",
-    "What is the largest ocean on Earth?",
-    "What is the chemical symbol for oxygen?",
-    "Who wrote 'Hamlet'?",
-    "What is the capital of Germany?",
-    "What is the fastest land animal?",
-    "What is the capital of Brazil?",
-    "What is the chemical symbol for carbon?",
-    "Who was the first man to walk on the moon?",
-    "What is the capital of China?",
-    "What is the tallest mountain in the world?",
-    "Who discovered penicillin?",
-    "What is the largest country by land area?",
-    "Who wrote 'Pride and Prejudice'?",
-    "What is the smallest country in the world?",
-    "Who discovered electricity?",
-    "What is the largest bird in the world?",
-    "Who wrote 'War and Peace'?",
-    "What is the largest lake in the world?",
-    "Who discovered America?",
-    "What is the largest island in the world?",
-    "Who discovered the theory of relativity?",
-    "What is the largest reptile in the world?",
-    "Who wrote '1984'?",
-    "What is the largest fish in the world?",
-    "Who discovered the structure of DNA?",
-    "Who wrote 'The Divine Comedy'?",
-    "What is the largest marsupial in the world?",
-    "Who discovered the electron?",
-    "Who wrote 'The Republic'?",
+general_questions = (
+    "What is the capital of France?"
+    "Who wrote 'Romeo and Juliet'?"
+    "What is the largest planet in the solar system?"
+    "What is the chemical symbol for water?"
+    "Who painted the Mona Lisa?"
+    "What is the smallest prime number?"
+    "What is the square root of 64?"
+    "What is the currency of Japan?"
+    "Who invented the telephone?"
+    "What is the longest river in the world?"
+    "What is the freezing point of water in Celsius?"
+    "What is the main gas found in Earth's atmosphere?"
+    "Who was the first president of the United States?"
+    "What is the capital of Australia?"
+    "What is the largest mammal in the world?"
+    "What is the chemical symbol for gold?"
+    "Who discovered gravity?"
+    "What is the capital of Canada?"
+    "What is the smallest continent by land area?"
+    "What is the capital of Italy?"
+    "What is the largest ocean on Earth?"
+    "What is the chemical symbol for oxygen?"
+    "Who wrote 'Hamlet'?"
+    "What is the capital of Germany?"
+    "What is the fastest land animal?"
+    "What is the capital of Brazil?"
+    "What is the chemical symbol for carbon?"
+    "Who was the first man to walk on the moon?"
+    "What is the capital of China?"
+    "What is the tallest mountain in the world?"
+    "Who discovered penicillin?"
+    "What is the largest country by land area?"
+    "Who wrote 'Pride and Prejudice'?"
+    "What is the smallest country in the world?"
+    "Who discovered electricity?"
+    "What is the largest bird in the world?"
+    "Who wrote 'War and Peace'?"
+    "What is the largest lake in the world?"
+    "Who discovered America?"
+    "What is the largest island in the world?"
+    "Who discovered the theory of relativity?"
+    "What is the largest reptile in the world?"
+    "Who wrote '1984'?"
+    "What is the largest fish in the world?"
+    "Who discovered the structure of DNA?"
+    "Who wrote 'The Divine Comedy'?"
+    "What is the largest marsupial in the world?"
+    "Who discovered the electron?"
+    "Who wrote 'The Republic'?"
     "Who discovered the proton?"
 )
         general_questions=(
