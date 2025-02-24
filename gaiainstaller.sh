@@ -3,9 +3,9 @@
 # Check if screen is installed
 if ! command -v screen &> /dev/null; then
     echo "❌ Screen is not installed. Installing screen..."
-    sudo apt-get install -y screen
     sudo apt update
     sudo apt install net-tools
+    sudo apt-get install -y screen
 else
     echo "✅ Screen is already installed."
 fi
