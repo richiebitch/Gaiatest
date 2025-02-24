@@ -223,21 +223,21 @@ while true; do
         7)
             echo "Restarting GaiaNet Node..."
             sudo netstat -tulnp | grep :8080
-            gaianet stop
-            gaianet init
-            gaianet start
-            gaianet info
+            ~/gaianet/bin/gaianet stop
+            ~/gaianet/bin/gaianet init
+            ~/gaianet/bin/gaianet start
+            ~/gaianet/bin/gaianet info
             ;;
 
         8)
             echo "Stopping GaiaNet Node..."
             sudo netstat -tulnp | grep :8080
-            gaianet stop
+            ~/gaianet/bin/gaianet stop
             ;;
 
         9)
             echo "Checking Your Gaia Node ID & Device ID..."
-            gaianet_info=$(gaianet info 2>/dev/null)
+            gaianet_info=$(~/gaianet/bin/gaianet info 2>/dev/null)
             if [[ -n "$gaianet_info" ]]; then
                 echo "$gaianet_info"
             else
