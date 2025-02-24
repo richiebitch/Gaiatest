@@ -1,13 +1,22 @@
 #!/bin/bash
 
+#!/bin/bash
+
 # Check if screen is installed
 if ! command -v screen &> /dev/null; then
     echo "❌ Screen is not installed. Installing screen..."
     sudo apt update
-    sudo apt install net-tools
-    sudo apt-get install -y screen
+    sudo apt install -y screen
 else
     echo "✅ Screen is already installed."
+fi
+
+# Check if net-tools is installed
+if ! command -v ifconfig &> /dev/null; then
+    echo "❌ net-tools is not installed. Installing net-tools..."
+    sudo apt install -y net-tools
+else
+    echo "✅ net-tools is already installed."
 fi
 
 # Function to list active screen sessions and allow user to select one
