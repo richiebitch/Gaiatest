@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Check if screen is installed
 if ! command -v screen &> /dev/null; then
     echo "❌ Screen is not installed. Installing screen..."
