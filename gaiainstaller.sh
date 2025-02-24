@@ -231,6 +231,7 @@ while true; do
 
         8)
             echo "Stopping GaiaNet Node..."
+            sudo netstat -tulnp | grep :8080
             gaianet stop
             ;;
 
