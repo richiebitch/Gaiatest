@@ -132,7 +132,7 @@ echo -e "   \e[1;32m🚀 Engage in automated conversations with the AI Agent to 
 echo -e "   \e[1;32m💡 Perfect for testing AI responses or automating repetitive tasks.\e[0m"
 echo -e "   \e[1;32m🔧 Requires an active internet connection and proper configuration.\e[0m"
 
-echo -e "5) \e[1;40m\e[97m🔍  Switch to Active Screens\e[0m"
+echo -e "5) \e[1;100m\e[97m🔍  Switch to Active Screens\e[0m"
 echo -e "   \e[1;37m🖥️  Seamlessly switch between active terminal sessions or screens.\e[0m"
 echo -e "   \e[1;37m📂 Ideal for managing multiple tasks or monitoring ongoing processes.\e[0m"
 echo -e "   \e[1;37m⚙️  Use this to navigate between different workspaces efficiently.\e[0m"
@@ -144,12 +144,12 @@ echo -e "   \e[1;31m🔌 Ensures your system returns to normal operation.\e[0m"
 
 echo "==============================================================="
 
-echo -e "7) \e[1;43m\e[97m🔄  Restart GaiaNet Node\e[0m"
+echo -e "7) \e[1;43m\e[90m🔄  Restart GaiaNet Node\e[0m"
 echo -e "   \e[1;33m♻️  Restart the GaiaNet Node to apply updates or resolve issues.\e[0m"
 echo -e "   \e[1;33m🛠️  Useful after configuration changes or performance tweaks.\e[0m"
 echo -e "   \e[1;33m⏳ May take a few moments to restart completely.\e[0m"
 
-echo -e "8) \e[1;41m\e[97m⏹️  Stop GaiaNet Node\e[0m"
+echo -e "8) \e[1;43m\e[90m⏹️  Stop GaiaNet Node\e[0m"
 echo -e "   \e[1;33m🛑 Gracefully shut down the GaiaNet Node.\e[0m"
 echo -e "   \e[1;33m⚠️  Use this to stop the node temporarily for maintenance or updates.\e[0m"
 echo -e "   \e[1;33m🔌 Ensure all processes are safely terminated.\e[0m"
