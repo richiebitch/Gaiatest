@@ -11,11 +11,11 @@ fi
 
 # Check if screen is installed
 if ! command -v screen &> /dev/null; then
-    echo "❌ Screen is not installed. Installing screen..."
+    echo "❌ screen is not installed. Installing screen..."
     sudo apt update
     sudo apt install -y screen
 else
-    echo "✅ Screen is already installed."
+    echo "✅ screen is already installed."
 fi
 
 # Check if net-tools is installed
@@ -24,6 +24,15 @@ if ! command -v ifconfig &> /dev/null; then
     sudo apt install -y net-tools
 else
     echo "✅ net-tools is already installed."
+fi
+
+# Check if lsof is installed
+if ! command -v lsof &> /dev/null; then
+    echo "❌ lsof is not installed. Installing lsof..."
+    sudo apt update
+    sudo apt install -y lsof
+else
+    echo "✅ lsof is already installed."
 fi
 
 # Function to list active screen sessions and allow user to select one
