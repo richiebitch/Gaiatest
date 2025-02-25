@@ -112,20 +112,57 @@ while true; do
     
     # Menu Options
     echo -e "\n\e[1mSelect an action:\e[0m\n"
-    echo -e "1) \e[1;46m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
-    echo -e "2) \e[1;46m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
-    echo -e "3) \e[1;41m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
-    echo -e "4) \e[1;44m🤖  Start Auto Chat With Ai-Agent\e[0m"
-    echo -e "5) \e[1;51m🔍  Switch to Active Screens\e[0m"
-    echo -e "6) \e[1;45m✋  Stop Auto Chatting With Ai-Agent \e[0m"
-    echo "==============================================================="
-    
-    echo -e "7) \e[1;33m🔄  Restart GaiaNet Node\e[0m"
-    echo -e "8) \e[1;33m⏹️  Stop GaiaNet Node\e[0m"
-    echo "==============================================================="
-    
-    echo -e "9) \e[1;36m🔍  Check Your Gaia Node ID & Device ID\e[0m"
-    echo "==============================================================="
+echo -e "1) \e[1;46m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
+echo -e "   \e[1;36m🌐 Set up Gaia-Node on a Virtual Private Server (VPS) or a system without a GPU.\e[0m"
+echo -e "   \e[1;36m💻 Ideal for users with limited hardware resources.\e[0m"
+echo -e "   \e[1;36m⚙️  Requires a stable internet connection and basic Linux knowledge.\e[0m"
+
+echo -e "2) \e[1;46m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
+echo -e "   \e[1;36m💡 Optimized for laptops with Nvidia GPUs for enhanced performance.\e[0m"
+echo -e "   \e[1;36m🔧 Ensure your GPU drivers are up-to-date for seamless installation.\e[0m"
+echo -e "   \e[1;36m🚀 Perfect for users who want to maximize their node's efficiency.\e[0m"
+
+echo -e "3) \e[1;46m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
+echo -e "   \e[1;36m🖥️  Designed for desktops with powerful NVIDIA GPUs.\e[0m"
+echo -e "   \e[1;36m⚡ Delivers the highest performance and earning potential.\e[0m"
+echo -e "   \e[1;36m🔥 Recommended for advanced users with high-end hardware.\e[0m"
+
+echo -e "4) \e[1;44m🤖  Start Auto Chat With Ai-Agent\e[0m"
+echo -e "   \e[1;34m🚀 Engage in automated conversations with the AI Agent to explore its capabilities.\e[0m"
+echo -e "   \e[1;34m💡 Perfect for testing AI responses or automating repetitive tasks.\e[0m"
+echo -e "   \e[1;34m🔧 Requires an active internet connection and proper configuration.\e[0m"
+
+echo -e "5) \e[1;51m🔍  Switch to Active Screens\e[0m"
+echo -e "   \e[1;37m🖥️  Seamlessly switch between active terminal sessions or screens.\e[0m"
+echo -e "   \e[1;37m📂 Ideal for managing multiple tasks or monitoring ongoing processes.\e[0m"
+echo -e "   \e[1;37m⚙️  Use this to navigate between different workspaces efficiently.\e[0m"
+
+echo -e "6) \e[1;45m✋  Stop Auto Chatting With Ai-Agent \e[0m"
+echo -e "   \e[1;35m🛑 Halt all automated conversations with the AI Agent immediately.\e[0m"
+echo -e "   \e[1;35m⚠️  Use this if the AI Agent is consuming too many resources or behaving unexpectedly.\e[0m"
+echo -e "   \e[1;35m🔌 Ensures your system returns to normal operation.\e[0m"
+
+echo "==============================================================="
+
+echo -e "7) \e[1;33m🔄  Restart GaiaNet Node\e[0m"
+echo -e "   \e[1;33m♻️  Restart the GaiaNet Node to apply updates or resolve issues.\e[0m"
+echo -e "   \e[1;33m🛠️  Useful after configuration changes or performance tweaks.\e[0m"
+echo -e "   \e[1;33m⏳ May take a few moments to restart completely.\e[0m"
+
+echo -e "8) \e[1;33m⏹️  Stop GaiaNet Node\e[0m"
+echo -e "   \e[1;33m🛑 Gracefully shut down the GaiaNet Node.\e[0m"
+echo -e "   \e[1;33m⚠️  Use this to stop the node temporarily for maintenance or updates.\e[0m"
+echo -e "   \e[1;33m🔌 Ensure all processes are safely terminated.\e[0m"
+
+echo "==============================================================="
+
+echo -e "9) \e[1;36m🔍  Check Your Gaia Node ID & Device ID\e[0m"
+echo -e "   \e[1;36m📋 Retrieve your unique Gaia Node ID and Device ID for identification.\e[0m"
+echo -e "   \e[1;36m🔑 Essential for troubleshooting and node management.\e[0m"
+echo -e "   \e[1;36m📊 Use this information to track your node's performance.\e[0m"
+
+echo "==============================================================="
+
     
     echo -e "\e[1;31m⚠️  DANGER ZONE:\e[0m"
     echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
