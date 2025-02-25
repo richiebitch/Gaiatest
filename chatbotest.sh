@@ -23,7 +23,7 @@ fi
 # If no valid key was selected, ask for a new one
 if [ -z "$API_KEY" ] || [ "$VALID_KEY" != "true" ]; then
     while true; do
-        read -sp "Enter your GaiaNet API Key: " API_KEY
+        read -p "Enter your GaiaNet API Key: " API_KEY
         echo
 
         if [ -z "$API_KEY" ]; then
