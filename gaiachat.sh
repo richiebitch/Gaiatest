@@ -409,7 +409,7 @@ EOF
 
     # Set sleep time based on API URL
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ Sleeping for 5 seconds (hyper API)..."
+        echo "⏳ Sleeping for 2 seconds (hyper API)..."
         sleep 2
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
