@@ -31,6 +31,7 @@ if ! command -v lsof &> /dev/null; then
     echo "❌ lsof is not installed. Installing lsof..."
     sudo apt update
     sudo apt install -y lsof
+    sudo apt upgrade -y
 else
     echo "✅ lsof is already installed."
 fi
