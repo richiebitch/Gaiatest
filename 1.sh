@@ -124,9 +124,9 @@ install_cuda() {
 # Set up CUDA environment variables
 setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
-    echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
-    source ~/.bashrc
+    echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' | sudo tee /etc/profile.d/cuda.sh
+    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' | sudo tee -a /etc/profile.d/cuda.sh
+    source /etc/profile.d/cuda.sh
 }
 
 # Install GaiaNet with appropriate CUDA support
@@ -148,13 +148,41 @@ install_gaianet() {
 
 # Add GaiaNet to PATH
 add_gaianet_to_path() {
-    echo 'export PATH=$HOME/gaianet/bin:$PATH' >> ~/.bashrc
+    echo "🔧 Adding GaiaNet to PATH for both user and root..."
+    
+    # Define the GaiaNet path
+    GAIA_PATH="$HOME/gaianet/bin"
+
+    # Update user's .bashrc
+    if ! grep -q "$GAIA_PATH" ~/.bashrc; then
+        echo "export PATH=$GAIA_PATH:\$PATH" >> ~/.bashrc
+    fi
+
+    # Update root's .bashrc (run only if script is executed with sudo)
+    if [ "$EUID" -eq 0 ]; then
+        if ! grep -q "$GAIA_PATH" /root/.bashrc; then
+            echo "export PATH=$GAIA_PATH:\$PATH" >> /root/.bashrc
+        fi
+    fi
+
+    # Update system-wide environment (for all users, including sudo)
+    if ! grep -q "$GAIA_PATH" /etc/profile.d/gaianet.sh 2>/dev/null; then
+        echo "export PATH=$GAIA_PATH:\$PATH" | sudo tee /etc/profile.d/gaianet.sh >/dev/null
+    fi
+
+    # Apply changes
     source ~/.bashrc
+    [ "$EUID" -eq 0 ] && source /root/.bashrc
+    source /etc/profile.d/gaianet.sh
+
+    echo "✅ GaiaNet added to PATH successfully."
 }
 
 # Main logic
 if check_nvidia_gpu; then
+    setup_cuda_env
     install_cuda
+    add_gaianet_to_path
     install_gaianet
 else
     install_gaianet
