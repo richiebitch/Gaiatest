@@ -69,7 +69,7 @@ get_api_key() {
     if [ -f "$API_KEY_FILE" ]; then
         # Read the API key from the file
         api_key=$(cat "$API_KEY_FILE")
-        echo "🔑 API Key loaded from $API_KEY_FILE."
+        echo "🔑 API Key loaded from the systum."
     else
         # Prompt the user to enter the API key
         while true; do
@@ -81,7 +81,7 @@ get_api_key() {
             else
                 # Save the API key to the file
                 echo "$api_key" > "$API_KEY_FILE"
-                echo "🔑 API Key saved to $API_KEY_FILE."
+                echo "🔑 API Key saved in the systum."
                 break
             fi
         done
