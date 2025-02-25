@@ -423,7 +423,7 @@ general_questions=(
 # Function to handle the API request
 send_request() {
     local message="$1"
-    local api_key="$2"
+    local API_KEY_DIR="$2"
 
     echo "📬 Sending Question to $API_NAME: $message"
 
@@ -438,7 +438,7 @@ EOF
     )
 
     response=$(curl -s -w "\n%{http_code}" -X POST "$API_URL" \
-        -H "Authorization: Bearer $api_key" \
+        -H "Authorization: Bearer $API_KEY_DIR" \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         -d "$json_data")
@@ -509,5 +509,5 @@ while true; do
     fi
 
     random_message=$(generate_random_general_question)
-    send_request "$random_message" "$api_key"
+    send_request "$random_message" "$API_KEY_DIR"
 done
