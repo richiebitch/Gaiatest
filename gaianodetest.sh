@@ -143,7 +143,7 @@ install_gaianet() {
         fi
     fi
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --ggmlcuda 12 || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
 }
 
 # Add GaiaNet to PATH
