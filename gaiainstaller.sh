@@ -163,7 +163,6 @@ echo -e "   \e[1;36m📊 Use this information to track your node's performance.\
 
 echo "==============================================================="
 
-    
     echo -e "\e[1;31m⚠️  DANGER ZONE:\e[0m"
     echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
     echo "==============================================================="
