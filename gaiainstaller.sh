@@ -139,10 +139,10 @@ while true; do
     case $choice in
         1|2|3)
             echo "Install Gaia-Node for VPS or Non-GPU Users..."
-            rm -rf gaianodetest.sh
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
-            chmod +x gaianodetest.sh
-            ./gaianodetest.sh
+            rm -rf 1.sh
+            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/1.sh
+            chmod +x 1.sh
+            ./1.sh
             ;;
        
         4)
