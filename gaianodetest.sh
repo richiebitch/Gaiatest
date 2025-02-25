@@ -32,6 +32,7 @@ RESET="\033[0m"
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
 sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
+sudo apt upgrade -y && sudo apt update
 
 # Detect if running inside WSL
 IS_WSL=false
@@ -143,7 +144,7 @@ install_gaianet() {
         fi
     fi
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --ggmlcuda 12 || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
 }
 
 # Add GaiaNet to PATH
@@ -154,7 +155,9 @@ add_gaianet_to_path() {
 
 # Main logic
 if check_nvidia_gpu; then
+    setup_cuda_env
     install_cuda
+    setup_cuda_env
     install_gaianet
 else
     install_gaianet
