@@ -1,7 +1,60 @@
-#!/bin/bash
+# Check for existing API keys
+API_KEY_DIR="/root/.gaianet_keys"
+mkdir -p "$API_KEY_DIR"
 
-# File to store the API key
-API_KEY_FILE="api_key.txt"
+EXISTING_KEYS=($(find "$API_KEY_DIR" -type f 2>/dev/null))
+
+if [ ${#EXISTING_KEYS[@]} -gt 0 ]; then
+    echo "Available API key files:"
+    select KEY_FILE in "${EXISTING_KEYS[@]}" "Enter a new API key"; do
+        if [[ "$KEY_FILE" == "Enter a new API key" ]]; then
+            break
+        elif [[ -n "$KEY_FILE" ]]; then
+            API_KEY=$(cat "$KEY_FILE")
+            echo "Using API key from: $KEY_FILE"
+            VALID_KEY=true
+            break
+        else
+            echo "Invalid selection. Try again."
+        fi
+    done
+fi
+
+# If no valid key was selected, ask for a new one
+if [ -z "$API_KEY" ] || [ "$VALID_KEY" != "true" ]; then
+    while true; do
+        read -sp "Enter your GaiaNet API Key: " API_KEY
+        echo
+
+        if [ -z "$API_KEY" ]; then
+            echo "❌ Error: API Key is required!"
+            echo "🔄 Restarting the installer..."
+
+            # Restart the installer (only if running from gaiainstaller.sh)
+            if [[ $0 == *gaiainstaller.sh ]]; then
+                rm -rf ~/gaiainstaller.sh
+                curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh
+                chmod +x gaiainstaller.sh
+                exec ./gaiainstaller.sh  # Use exec to replace current process
+            else
+                exit 1
+            fi
+        else
+            break  # Exit loop if API key is provided
+        fi
+    done
+
+    # Save the new API key
+    read -p "Enter a name for the API key file: " FILE_NAME
+    API_KEY_FILE="$API_KEY_DIR/$FILE_NAME"
+
+    echo "$API_KEY" > "$API_KEY_FILE"
+    chmod 600 "$API_KEY_FILE"
+    echo "API Key saved as $API_KEY_FILE."
+fi
+
+# Continue script...
+echo "Starting GaiaNet with API Key: $API_KEY"
 
 # Function to check if NVIDIA CUDA or GPU is present
 check_cuda() {
@@ -64,85 +117,78 @@ set_api_url() {
     echo "🔗 Using API: ($API_NAME)"
 }
 
-# Function to get the API key
-get_api_key() {
-    if [ -f "$API_KEY_FILE" ]; then
-        # Read the API key from the file
-        api_key=$(cat "$API_KEY_FILE")
-        echo "🔑 API Key loaded from the systum."
+# Set the API URL based on system type and CUDA presence
+set_api_url
+
+# Check if jq is installed, and if not, install it
+if ! command -v jq &> /dev/null; then
+    echo "❌ jq not found. Installing jq..."
+    sudo apt update && sudo apt install jq -y
+    if [ $? -eq 0 ]; then
+        echo "✅ jq installed successfully!"
     else
-        # Prompt the user to enter the API key
-        while true; do
-            echo -n "Enter your API Key: "
-            read -r api_key
-
-            if [ -z "$api_key" ]; then
-                echo "❌ Error: API Key is required!"
-            else
-                # Save the API key to the file
-                echo "$api_key" > "$API_KEY_FILE"
-                echo "🔑 API Key saved in the systum."
-                break
-            fi
-        done
+        echo "❌ Failed to install jq. Please install jq manually and re-run the script."
+        exit 1
     fi
-}
+else
+    echo "✅ jq is already installed."
+fi
 
-# Function to generate a random general question
+# Function to get a random general question based on the API URL
 generate_random_general_question() {
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        general_questions=(
-            "What is the capital of France?"
-            "Who wrote 'Romeo and Juliet'?"
-            "What is the largest planet in the solar system?"
-            "What is the chemical symbol for water?"
-            "Who painted the Mona Lisa?"
-            "What is the smallest prime number?"
-            "What is the square root of 64?"
-            "What is the currency of Japan?"
-            "Who invented the telephone?"
-            "What is the longest river in the world?"
-            "What is the freezing point of water in Celsius?"
-            "What is the main gas found in Earth's atmosphere?"
-            "Who was the first president of the United States?"
-            "What is the capital of Australia?"
-            "What is the largest mammal in the world?"
-            "What is the chemical symbol for gold?"
-            "Who discovered gravity?"
-            "What is the capital of Canada?"
-            "What is the smallest continent by land area?"
-            "What is the capital of Italy?"
-            "What is the largest ocean on Earth?"
-            "What is the chemical symbol for oxygen?"
-            "Who wrote 'Hamlet'?"
-            "What is the capital of Germany?"
-            "What is the fastest land animal?"
-            "What is the capital of Brazil?"
-            "What is the chemical symbol for carbon?"
-            "Who was the first man to walk on the moon?"
-            "What is the capital of China?"
-            "What is the tallest mountain in the world?"
-            "Who discovered penicillin?"
-            "What is the largest country by land area?"
-            "Who wrote 'Pride and Prejudice'?"
-            "What is the smallest country in the world?"
-            "Who discovered electricity?"
-            "What is the largest bird in the world?"
-            "Who wrote 'War and Peace'?"
-            "What is the largest lake in the world?"
-            "Who discovered America?"
-            "What is the largest island in the world?"
-            "Who discovered the theory of relativity?"
-            "What is the largest reptile in the world?"
-            "Who wrote '1984'?"
-            "What is the largest fish in the world?"
-            "Who discovered the structure of DNA?"
-            "Who wrote 'The Divine Comedy'?"
-            "What is the largest marsupial in the world?"
-            "Who discovered the electron?"
-            "Who wrote 'The Republic'?"
-            "Who discovered the proton?"
-        )
+general_questions=(
+    "What is the capital of France?"
+    "Who wrote 'Romeo and Juliet'?"
+    "What is the largest planet in the solar system?"
+    "What is the chemical symbol for water?"
+    "Who painted the Mona Lisa?"
+    "What is the smallest prime number?"
+    "What is the square root of 64?"
+    "What is the currency of Japan?"
+    "Who invented the telephone?"
+    "What is the longest river in the world?"
+    "What is the freezing point of water in Celsius?"
+    "What is the main gas found in Earth's atmosphere?"
+    "Who was the first president of the United States?"
+    "What is the capital of Australia?"
+    "What is the largest mammal in the world?"
+    "What is the chemical symbol for gold?"
+    "Who discovered gravity?"
+    "What is the capital of Canada?"
+    "What is the smallest continent by land area?"
+    "What is the capital of Italy?"
+    "What is the largest ocean on Earth?"
+    "What is the chemical symbol for oxygen?"
+    "Who wrote 'Hamlet'?"
+    "What is the capital of Germany?"
+    "What is the fastest land animal?"
+    "What is the capital of Brazil?"
+    "What is the chemical symbol for carbon?"
+    "Who was the first man to walk on the moon?"
+    "What is the capital of China?"
+    "What is the tallest mountain in the world?"
+    "Who discovered penicillin?"
+    "What is the largest country by land area?"
+    "Who wrote 'Pride and Prejudice'?"
+    "What is the smallest country in the world?"
+    "Who discovered electricity?"
+    "What is the largest bird in the world?"
+    "Who wrote 'War and Peace'?"
+    "What is the largest lake in the world?"
+    "Who discovered America?"
+    "What is the largest island in the world?"
+    "Who discovered the theory of relativity?"
+    "What is the largest reptile in the world?"
+    "Who wrote '1984'?"
+    "What is the largest fish in the world?"
+    "Who discovered the structure of DNA?"
+    "Who wrote 'The Divine Comedy'?"
+    "What is the largest marsupial in the world?"
+    "Who discovered the electron?"
+    "Who wrote 'The Republic'?"
+    "Who discovered the proton?"
+)
     elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "Who is the current President of the United States?"
@@ -429,26 +475,6 @@ EOF
         sleep 0
     fi
 }
-
-# Set the API URL based on system type and CUDA presence
-set_api_url
-
-# Check if jq is installed, and if not, install it
-if ! command -v jq &> /dev/null; then
-    echo "❌ jq not found. Installing jq..."
-    sudo apt update && sudo apt install jq -y
-    if [ $? -eq 0 ]; then
-        echo "✅ jq installed successfully!"
-    else
-        echo "❌ Failed to install jq. Please install jq manually and re-run the script."
-        exit 1
-    fi
-else
-    echo "✅ jq is already installed."
-fi
-
-# Get the API key
-get_api_key
 
 # Asking for duration
 echo -n "⏳ How many hours do you want the bot to run? "
