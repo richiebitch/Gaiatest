@@ -113,8 +113,8 @@ while true; do
     # Menu Options
     echo -e "\n\e[1mSelect an action:\e[0m\n"
 echo -e "1) \e[1;46m\e[97m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
-echo -e "   \e[1;36m🌐 Set up Gaia-Node on a Virtual Private Server (VPS) or a system without a GPU.\e[0m"
-echo -e "   \e[1;36m💻 Ideal for users with limited hardware resources.\e[0m"
+echo -e "   \e[1;36m🌐  Set up Gaia-Node on a Virtual Private Server (VPS) or a system without a GPU.\e[0m"
+echo -e "   \e[1;36m💻  Ideal for users with limited hardware resources.\e[0m"
 echo -e "   \e[1;36m⚙️  Requires a stable internet connection.\e[0m"
 
 echo -e "2) \e[1;45m\e[97m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
@@ -124,8 +124,8 @@ echo -e "   \e[1;35m🚀 Perfect for users who want to maximize their node's eff
 
 echo -e "3) \e[1;44m\e[97m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
 echo -e "   \e[1;34m🖥️  Designed for desktops with powerful NVIDIA GPUs.\e[0m"
-echo -e "   \e[1;34m⚡ Delivers the highest performance and earning potential.\e[0m"
-echo -e "   \e[1;34m🔥 Recommended for advanced users with high-end hardware.\e[0m"
+echo -e "   \e[1;34m⚡  Delivers the highest performance and earning potential.\e[0m"
+echo -e "   \e[1;34m🔥  Recommended for advanced users with high-end hardware.\e[0m"
 
 echo -e "4) \e[1;42m\e[97m🤖  Start Auto Chat With Ai-Agent\e[0m"
 echo -e "   \e[1;32m🚀 Engage in automated conversations with the AI Agent to explore its capabilities.\e[0m"
@@ -134,13 +134,13 @@ echo -e "   \e[1;32m🔧 Requires an active internet connection and proper confi
 
 echo -e "5) \e[1;100m\e[97m🔍  Switch to Active Screens\e[0m"
 echo -e "   \e[1;37m🖥️  Seamlessly switch between active terminal sessions or screens.\e[0m"
-echo -e "   \e[1;37m📂 Ideal for managing multiple tasks or monitoring ongoing processes.\e[0m"
+echo -e "   \e[1;37m📂  Ideal for managing multiple tasks or monitoring ongoing processes.\e[0m"
 echo -e "   \e[1;37m⚙️  Use this to navigate between different workspaces efficiently.\e[0m"
 
 echo -e "6) \e[1;41m\e[97m✋  Stop Auto Chatting With Ai-Agent\e[0m"
-echo -e "   \e[1;31m🛑 Halt all automated conversations with the AI Agent immediately.\e[0m"
+echo -e "   \e[1;31m🛑  Halt all automated conversations with the AI Agent immediately.\e[0m"
 echo -e "   \e[1;31m⚠️  Use this if the AI Agent is consuming too many resources or behaving unexpectedly.\e[0m"
-echo -e "   \e[1;31m🔌 Ensures your system returns to normal operation.\e[0m"
+echo -e "   \e[1;31m🔌  Ensures your system returns to normal operation.\e[0m"
 
 echo "==============================================================="
 
