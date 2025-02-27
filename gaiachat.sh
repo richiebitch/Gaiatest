@@ -409,8 +409,8 @@ while true; do
         echo "🔄 Restarting the installer..."
 
         # Restart installer
-        rm -rf GaiaNodeInstallet.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh && chmod +x GaiaNodeInstallet.sh && ./GaiaNodeInstallet.sh
+        rm -rf gaiainstaller.sh
+        curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh; chmod +x gaiainstaller.sh; ./gaiainstaller.sh
 
         exit 1
     else
