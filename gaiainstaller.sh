@@ -284,6 +284,8 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
     sleep 5
     screen -r gaiabot
 fi
+;;
+
         6)
             echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
             # Terminate all 'gaiabot' screen sessions
