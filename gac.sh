@@ -209,7 +209,7 @@ else
 fi
 
 # Hidden API URL (moved to the bottom)
-API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+API_URL="https://gadao.gaia.domains/v1/chat/completions"
 
 # Display thread information
 echo "✅ Using 1 thread..."
