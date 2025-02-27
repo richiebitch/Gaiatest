@@ -183,83 +183,106 @@ echo "==============================================================="
             ;;
        
         4)
-            echo "Detecting system configuration..."
+# Function to check if a port is active
+check_port() {
+    local port=$1
+    if sudo lsof -i :$port > /dev/null 2>&1; then
+        echo -e "\e[1;32m✅ Port $port is active. GaiaNet node is running.\e[0m"
+        return 0
+    else
+        return 1
+    fi
+}
 
-            # Check if GaiaNet is installed
-            if ! command -v ~/gaianet/bin/gaianet &> /dev/null; then
-                echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
-                echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-                read -rp "Press Enter to return to the main menu..."
-                continue
-            fi
+# Function to check if the system is a VPS, laptop, or desktop
+check_if_vps_or_laptop() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 0
+    else
+        echo "✅ This is a Desktop."
+        return 1
+    fi
+}
 
-            # Check if GaiaNet is installed properly
-            gaianet_info=$( ~/gaianet/bin/gaianet info 2>/dev/null )
-            if [[ -z "$gaianet_info" ]]; then
-                echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
-                echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
-                echo -e "\e[1;33m🔍 Run: \e[1;33m'go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-                read -rp "Press Enter to return to the main menu..."
-                continue
-            fi
+# Main script logic
+echo "Detecting system configuration..."
 
-            # Proceed if GaiaNet is properly installed
-            if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
+# Check if GaiaNet is installed
+if ! command -v ~/gaianet/bin/gaianet &> /dev/null; then
+    echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
+    echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
+    read -rp "Press Enter to return to the main menu..."
+    continue
+fi
 
-                # Check if port 8080 is active using lsof
-                if sudo lsof -i :8080 > /dev/null 2>&1; then
-                    echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
-                else
-                    echo -e "\e[1;31m❌ GaiaNode is not running.\e[0m"
-                    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-                    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-                    read -rp "Press Enter to return to the main menu..."
-                    continue
-                fi
+# Check if GaiaNet is installed properly
+gaianet_info=$( ~/gaianet/bin/gaianet info 2>/dev/null )
+if [[ -z "$gaianet_info" ]]; then
+    echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
+    echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
+    echo -e "\e[1;33m🔍 Run: \e[1;33m'go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
+    read -rp "Press Enter to return to the main menu..."
+    continue
+fi
 
-                # Function to check if the system is a VPS, laptop, or desktop
-                check_if_vps_or_laptop() {
-                    vps_type=$(systemd-detect-virt)
-                    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-                        echo "✅ This is a VPS."
-                        return 0
-                    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-                        echo "✅ This is a Laptop."
-                        return 0
-                    else
-                        echo "✅ This is a Desktop."
-                        return 1
-                    fi
-                }
+# Proceed if GaiaNet is properly installed
+if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+    echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
 
-                # Determine the appropriate script based on system type
-                if check_if_vps_or_laptop; then
-                    script_name="gaiachat.sh"
-                else
-                    if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-                        echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-                        script_name="gaiachat.sh"
-                    else
-                        echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-                        script_name="gaiachat.sh"
-                    fi
-                fi
+    # Check if at least one of the ports is active
+    ports=(8080 8081 8082 8083)
+    at_least_one_port_active=false
 
-                # Start the chatbot in a detached screen session
-                sudo screen -dmS gaiabot bash -c '
-                curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
-                if [ -f "'"$script_name"'" ]; then
-                    ./'"$script_name"'
-                    exec bash
-                else
-                    echo "❌ Error: Failed to download '"$script_name"'"
-                    sleep 10
-                fi'
+    echo -e "\e[1;34m🔍 Checking ports...\e[0m"
+    for port in "${ports[@]}"; do
+        if check_port $port; then
+            at_least_one_port_active=true
+        fi
+    done
 
-                sleep 2
-                screen -r gaiabot
-            fi
+    # If none of the ports are active, provide additional instructions
+    if ! $at_least_one_port_active; then
+        echo -e "\e[1;31m❌ No active ports found.\e[0m"
+        echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+        echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
+        read -rp "Press Enter to return to the main menu..."
+        continue
+    fi
+
+    echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
+
+    # Determine the appropriate script based on system type
+    if check_if_vps_or_laptop; then
+        script_name="gaiachat.sh"
+    else
+        if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
+            echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+            script_name="gaiachat.sh"
+        else
+            echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+            script_name="gaiachat.sh"
+        fi
+    fi
+
+    # Start the chatbot in a detached screen session
+    sudo screen -dmS gaiabot bash -c '
+    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+    if [ -f "'"$script_name"'" ]; then
+        ./'"$script_name"'
+        exec bash
+    else
+        echo "❌ Error: Failed to download '"$script_name"'"
+        sleep 10
+    fi'
+
+    sleep 2
+    screen -r gaiabot
+fi
             ;;
 
         5)
