@@ -86,24 +86,16 @@ install_cuda() {
         DEB_URL="https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb"
     fi
 
-    # Download the .pin file if it doesn't exist
-    if [ ! -f "$PIN_FILE" ]; then
-        echo "📥 Downloading $PIN_FILE from $PIN_URL..."
-        wget "$PIN_URL" || { echo "❌ Failed to download $PIN_FILE from $PIN_URL"; exit 1; }
-    else
-        echo "✅ $PIN_FILE already exists. Skipping download."
-    fi
+    # Download the .pin file
+    echo "📥 Downloading $PIN_FILE from $PIN_URL..."
+    wget "$PIN_URL" || { echo "❌ Failed to download $PIN_FILE from $PIN_URL"; exit 1; }
 
     # Move the .pin file to the correct location
     sudo mv "$PIN_FILE" /etc/apt/preferences.d/cuda-repository-pin-600 || { echo "❌ Failed to move $PIN_FILE to /etc/apt/preferences.d/"; exit 1; }
 
-    # Download the .deb file if it doesn't exist
-    if [ ! -f "$DEB_FILE" ]; then
-        echo "📥 Downloading $DEB_FILE from $DEB_URL..."
-        wget "$DEB_URL" || { echo "❌ Failed to download $DEB_FILE from $DEB_URL"; exit 1; }
-    else
-        echo "✅ $DEB_FILE already exists. Skipping download."
-    fi
+    # Download the .deb file
+    echo "📥 Downloading $DEB_FILE from $DEB_URL..."
+    wget "$DEB_URL" || { echo "❌ Failed to download $DEB_FILE from $DEB_URL"; exit 1; }
 
     # Install the .deb file
     sudo dpkg -i "$DEB_FILE" || { echo "❌ Failed to install $DEB_FILE"; exit 1; }
