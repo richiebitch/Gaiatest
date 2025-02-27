@@ -207,38 +207,16 @@ echo "==============================================================="
             if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
                 echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
 
-# Function to check if a port is active
-check_port() {
-    local port=$1
-    if sudo lsof -i :$port > /dev/null 2>&1; then
-        echo -e "\e[1;32m✅ Port $port is active. GaiaNet node is running.\e[0m"
-        return 0
-    else
-        echo -e "\e[1;31m❌ Port $port is not running.\e[0m"
-        return 1
-    fi
-}
-
-# Check each port
-ports=(8080 8081 8082 8083)
-all_ports_active=true
-
-for port in "${ports[@]}"; do
-    if ! check_port $port; then
-        all_ports_active=false
-    fi
-done
-
-# If any port is not active, provide additional instructions
-if ! $all_ports_active; then
-    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-    read -rp "Press Enter to return to the main menu..."
-    continue
-fi
-
-# If all ports are active, continue with the rest of the script
-echo -e "\e[1;32m🎉 All ports are active. GaiaNet node is running smoothly.\e[0m"
+                # Check if port 8080 is active using lsof
+                if sudo lsof -i :8080 > /dev/null 2>&1; then
+                    echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
+                else
+                    echo -e "\e[1;31m❌ GaiaNode is not running.\e[0m"
+                    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+                    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
+                    read -rp "Press Enter to return to the main menu..."
+                    continue
+                fi
 
                 # Function to check if the system is a VPS, laptop, or desktop
                 check_if_vps_or_laptop() {
