@@ -181,6 +181,8 @@ echo "==============================================================="
             chmod +x 1.sh
             ./1.sh
             ;;
+
+4)
        
 # Function to check if a port is active
 check_port() {
