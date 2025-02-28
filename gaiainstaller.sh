@@ -275,7 +275,7 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
     fi
 
     # Start the chatbot in a detached screen session
-    screen -dmS gaiabot bash -c '
+    sudo screen -dmS gaiabot bash -c '
     curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
     if [ -f "'"$script_name"'" ]; then
         ./'"$script_name"'
