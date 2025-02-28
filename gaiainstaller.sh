@@ -300,7 +300,8 @@ select_screen_session() {
         screen -d -r "$selected_session"
         break
     done
-}
+fi
+;;
 
         6)
             echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
