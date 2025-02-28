@@ -300,7 +300,6 @@ select_screen_session() {
         screen -d -r "$selected_session"
         break
     done
-fi
 ;;
 
         6)
