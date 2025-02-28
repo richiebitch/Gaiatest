@@ -204,13 +204,10 @@ check_if_vps_or_laptop() {
     vps_type=$(systemd-detect-virt)
     if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
         echo "✅ This is a VPS."
-        return 0
     elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
         echo "✅ This is a Laptop."
-        return 1
     else
         echo "✅ This is a Desktop."
-        return 2
     fi
 }
 
