@@ -36,53 +36,19 @@ else
     echo "✅ lsof is already installed."
 fi
 
-# Function to list active screen sessions and allow user to select one
-select_screen_session() {
-    while true; do
-        echo "Checking for active screen sessions..."
-        
-        # Get the list of active screen sessions
-        sessions=$(screen -list | grep -oP '\d+\.\S+' | awk '{print $1}')
-        
-        # Check if there are any active sessions
-        if [ -z "$sessions" ]; then
-            echo "No active screen sessions found."
-            return  # Return to the main menu
-        fi
-        
-        # Display the list of sessions with numbers
-        echo "Active screen sessions:"
-        i=1
-        declare -A session_map
-        for session in $sessions; do
-            session_name=$(echo "$session" | cut -d'.' -f2)
-            echo "$i) $session_name"
-            session_map[$i]=$session
-            i=$((i+1))
-        done
-        
-        # Prompt the user to select a session
-        echo -n "Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
-        read -r choice
-        
-        # If the user presses Enter, return to the main menu
-        if [ -z "$choice" ]; then
-            return  # Return to the main menu
-        fi
-        
-        # Validate the user's choice
-        if [[ -z "${session_map[$choice]}" ]]; then
-            echo "Invalid selection. Please try again."
-            continue
-        fi
-        
-        # Attach to the selected session
-        selected_session=${session_map[$choice]}
-        echo "Attaching to session: $selected_session"
-        screen -d -r "$selected_session"
-        break
-    done
-}
+# Check if jq is installed, and if not, install it
+if ! command -v jq &> /dev/null; then
+    echo "❌ jq not found. Installing jq..."
+    sudo apt update && sudo apt install jq -y
+    if [ $? -eq 0 ]; then
+        echo "✅ jq installed successfully!"
+    else
+        echo "❌ Failed to install jq. Please install jq manually and re-run the script."
+        exit 1
+    fi
+else
+    echo "✅ jq is already installed."
+fi
 
 while true; do
     clear
@@ -286,6 +252,55 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
     screen -r gaiabot
 fi
 ;;
+
+5)
+# Function to list active screen sessions and allow user to select one
+select_screen_session() {
+    while true; do
+        echo "Checking for active screen sessions..."
+        
+        # Get the list of active screen sessions
+        sessions=$(screen -list | grep -oP '\d+\.\S+' | awk '{print $1}')
+        
+        # Check if there are any active sessions
+        if [ -z "$sessions" ]; then
+            echo "No active screen sessions found."
+            return  # Return to the main menu
+        fi
+        
+        # Display the list of sessions with numbers
+        echo "Active screen sessions:"
+        i=1
+        declare -A session_map
+        for session in $sessions; do
+            session_name=$(echo "$session" | cut -d'.' -f2)
+            echo "$i) $session_name"
+            session_map[$i]=$session
+            i=$((i+1))
+        done
+        
+        # Prompt the user to select a session
+        echo -n "Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
+        read -r choice
+        
+        # If the user presses Enter, return to the main menu
+        if [ -z "$choice" ]; then
+            return  # Return to the main menu
+        fi
+        
+        # Validate the user's choice
+        if [[ -z "${session_map[$choice]}" ]]; then
+            echo "Invalid selection. Please try again."
+            continue
+        fi
+        
+        # Attach to the selected session
+        selected_session=${session_map[$choice]}
+        echo "Attaching to session: $selected_session"
+        screen -d -r "$selected_session"
+        break
+    done
+}
 
         6)
             echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
