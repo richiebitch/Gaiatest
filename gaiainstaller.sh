@@ -285,7 +285,7 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
         exit 1
     fi'
 
-    sleep 5
+    sleep 500
     screen -r gaiabot
 fi
 ;;
