@@ -447,6 +447,7 @@ while true; do
     if [[ "$elapsed" -ge "$max_duration" ]]; then
         echo "🛑 Time limit reached ($bot_hours hours). Exiting..."
         echo "📊 Total successful responses: $success_count"
+        sleep 100000
         exit 0
     fi
 
