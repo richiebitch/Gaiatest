@@ -14,7 +14,7 @@ check_cuda() {
 # Function to check if the system is a VPS, Laptop, or Desktop
 check_system_type() {
     vps_type=$(systemd-detect-virt)
-    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+    if echo "$vps_type" | grep -qiE "docker|kvm|qemu|vmware|xen|lxc"; then
         echo "✅ This is a VPS."
         return 0  # VPS
     elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
