@@ -12,30 +12,57 @@ is_installed() {
 }
 
 # Fix Google Chrome GPG key issue
-wget -qO - https://dl.google.com/linux/linux_signing_key.pub | sudo tee /etc/apt/trusted.gpg.d/google-chrome.asc
+if ! test -f /etc/apt/trusted.gpg.d/google-chrome.asc; then
+    echo "Adding Google Chrome GPG key..."
+    wget -qO - https://dl.google.com/linux/linux_signing_key.pub | sudo tee /etc/apt/trusted.gpg.d/google-chrome.asc
+else
+    echo "Google Chrome GPG key already exists, skipping."
+fi
 
 # Update package lists
-apt update
+echo "Updating package list..."
+apt update -q
 
 # Show upgradable packages
-apt list --upgradable
+echo "Checking for upgradable packages..."
+UPGRADABLE=$(apt list --upgradable 2>/dev/null | grep -v "Listing..." || true)
+
+if [ -z "$UPGRADABLE" ]; then
+    echo "All packages are up to date. Skipping upgrade."
+else
+    echo "Upgradable packages found:"
+    echo "$UPGRADABLE"
+    echo "Upgrading packages..."
+    apt upgrade -y
+fi
 
 # Install required packages only if not already installed
-for pkg in sudo curl htop systemd fonts-noto-color-emoji; do
+REQUIRED_PACKAGES=(sudo curl htop systemd fonts-noto-color-emoji)
+ALL_INSTALLED=true
+
+for pkg in "${REQUIRED_PACKAGES[@]}"; do
     if ! is_installed "$pkg"; then
         echo "Installing $pkg..."
         apt install -y "$pkg"
+        ALL_INSTALLED=false
     else
         echo "$pkg is already installed, skipping."
     fi
 done
 
-# Upgrade packages if any are upgradable
-apt list --upgradable | grep -q upgradable && apt upgrade -y
+if $ALL_INSTALLED; then
+    echo "All required packages are already installed. Skipping installation."
+fi
 
 # Download and execute the Gaia installer script
 INSTALLER="gaiainstaller.sh"
-rm -f "$INSTALLER"
+
+if [ -f "$INSTALLER" ]; then
+    echo "Gaia installer script already exists, removing old version..."
+    rm -f "$INSTALLER"
+fi
+
+echo "Downloading latest Gaia installer script..."
 curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh
 chmod +x "$INSTALLER"
 ./"$INSTALLER"
