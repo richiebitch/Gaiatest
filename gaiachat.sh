@@ -382,7 +382,7 @@ EOF
             echo "💬 Response: $response_message"
         fi
     else
-        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying..."
+        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
         sleep 5
     fi
 
