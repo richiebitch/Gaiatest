@@ -395,7 +395,7 @@ EOF
         sleep 2
     elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching..."
-        sleep 0
+        sleep 1
     fi
 }
 
