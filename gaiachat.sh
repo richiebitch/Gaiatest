@@ -399,24 +399,72 @@ EOF
     fi
 }
 
-# Asking for API Key (loops until a valid key is provided)
-while true; do
+API_KEY_DIR="/"
+API_KEY_LIST=($(ls $API_KEY_DIR | grep '^apikey_'))  # List of saved API keys
+
+load_existing_key() {
+    echo "🔍 Detected existing API keys:"
+    for i in "${!API_KEY_LIST[@]}"; do
+        echo "$((i+1))) ${API_KEY_LIST[$i]}"
+    done
+
+    echo -n "👉 Select a key to load (Enter number): "
+    read -r key_choice
+
+    if [[ "$key_choice" =~ ^[0-9]+$ ]] && ((key_choice > 0 && key_choice <= ${#API_KEY_LIST[@]})); then
+        selected_file="${API_KEY_LIST[$((key_choice-1))]}"
+        api_key=$(cat "$API_KEY_DIR/$selected_file")
+        echo "✅ Loaded API key from $selected_file"
+    else
+        echo "❌ Invalid selection. Exiting..."
+        exit 1
+    fi
+}
+
+save_new_key() {
     echo -n "Enter your API Key: "
     read -r api_key
 
     if [ -z "$api_key" ]; then
         echo "❌ Error: API Key is required!"
-        echo "🔄 Restarting the installer..."
-
-        # Restart installer
-        rm -rf gaiainstaller.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh; chmod +x gaiainstaller.sh; ./gaiainstaller.sh
-
         exit 1
-    else
-        break  # Exit loop if API key is provided
     fi
-done
+
+    while true; do
+        echo -n "Enter a name to save this key (no spaces): "
+        read -r key_name
+        key_name=$(echo "$key_name" | tr -d ' ')  # Remove spaces
+
+        if [ -z "$key_name" ]; then
+            echo "❌ Error: Name cannot be empty!"
+        elif [ -f "$API_KEY_DIR/apikey_$key_name" ]; then
+            echo "⚠️  A key with this name already exists! Choose a different name."
+        else
+            echo "$api_key" > "$API_KEY_DIR/apikey_$key_name"
+            chmod 600 "$API_KEY_DIR/apikey_$key_name"  # Secure the key file
+            echo "✅ API Key saved as 'apikey_$key_name'"
+            break
+        fi
+    done
+}
+
+# Main Logic
+if [ ${#API_KEY_LIST[@]} -gt 0 ]; then
+    echo "📂 Existing API keys detected."
+    echo "1) Load an existing API key"
+    echo "2) Enter a new API key"
+    echo -n "👉 Choose an option (1 or 2): "
+    read -r choice
+
+    case "$choice" in
+        1) load_existing_key ;;
+        2) save_new_key ;;
+        *) echo "❌ Invalid choice. Exiting..." && exit 1 ;;
+    esac
+else
+    echo "🔑 No saved API keys found. Please enter a new one."
+    save_new_key
+fi
 
 # Asking for duration
 echo -n "⏳ How many hours do you want the bot to run? "
