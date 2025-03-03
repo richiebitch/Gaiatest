@@ -201,7 +201,7 @@ install_gaianet() {
 
 # Function to verify installation
 verify_gaianet_installation() {
-    if [ -f "$BASE_DIR/bin" ]; then
+    if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "✅ GaiaNet installed successfully in $BASE_DIR."
         add_gaianet_to_path
     else
@@ -225,19 +225,19 @@ add_gaianet_to_path() {
 # Function to configure GaiaNet port
 configure_gaianet_port() {
     echo "🔧 Configuring GaiaNet on port $PORT..."
-    "$BASE_DIR/bin" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; exit 1; }
+    "$BASE_DIR/bin" gaianet config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; exit 1; }
 }
 
 # Function to initialize and start GaiaNet
 initialize_gaianet() {
     echo "⚙️ Initializing GaiaNet..."
-    "$BASE_DIR/bin" init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    "$BASE_DIR/bin" gaianet init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
     echo "🚀 Starting GaiaNet node..."
-    "$BASE_DIR/bin" start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
+    "$BASE_DIR/bin" gaianet start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
     echo "🔍 Fetching GaiaNet node information..."
-    "$BASE_DIR/bin" info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
+    "$BASE_DIR/bin" gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 }
 
 main() {
