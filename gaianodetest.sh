@@ -69,65 +69,31 @@ check_system_type() {
     fi
 }
 
-# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
+# Function to install CUDA Toolkit in WSL or Ubuntu 24.04
 install_cuda() {
     if $IS_WSL; then
         echo "🖥️ Installing CUDA for WSL 2..."
-        # Define file names and URLs for WSL
-        PIN_FILE="cuda-wsl-ubuntu.pin"
-        PIN_URL="https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin"
-        DEB_FILE="cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb"
-        DEB_URL="https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb"
     else
         echo "🖥️ Installing CUDA for Ubuntu 24.04..."
-        # Define file names and URLs for Ubuntu 24.04
-        PIN_FILE="cuda-ubuntu2404.pin"
-        PIN_URL="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin"
-        DEB_FILE="cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb"
-        DEB_URL="https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb"
     fi
 
-    # Download the .pin file if it doesn't exist
-    if [ ! -f "$PIN_FILE" ]; then
-        echo "📥 Downloading $PIN_FILE from $PIN_URL..."
-        wget "$PIN_URL" || { echo "❌ Failed to download $PIN_FILE from $PIN_URL"; exit 1; }
-    else
-        echo "✅ $PIN_FILE already exists. Skipping download."
-    fi
-
-    # Move the .pin file to the correct location
-    sudo mv "$PIN_FILE" /etc/apt/preferences.d/cuda-repository-pin-600 || { echo "❌ Failed to move $PIN_FILE to /etc/apt/preferences.d/"; exit 1; }
-
-    # Download the .deb file if it doesn't exist
-    if [ ! -f "$DEB_FILE" ]; then
-        echo "📥 Downloading $DEB_FILE from $DEB_URL..."
-        wget "$DEB_URL" || { echo "❌ Failed to download $DEB_FILE from $DEB_URL"; exit 1; }
-    else
-        echo "✅ $DEB_FILE already exists. Skipping download."
-    fi
-
-    # Install the .deb file
-    sudo dpkg -i "$DEB_FILE" || { echo "❌ Failed to install $DEB_FILE"; exit 1; }
-
-    # Copy the keyring
-    sudo cp /var/cuda-repo-*/cuda-*-keyring.gpg /usr/share/keyrings/ || { echo "❌ Failed to copy CUDA keyring to /usr/share/keyrings/"; exit 1; }
-
-    # Update the package list and install CUDA Toolkit 12.8
+    # Update package list and install CUDA Toolkit
     echo "🔄 Updating package list..."
-    sudo apt-get update || { echo "❌ Failed to update package list"; exit 1; }
-    echo "🔧 Installing CUDA Toolkit 12.8..."
-    sudo apt-get install -y cuda-toolkit-12-8 || { echo "❌ Failed to install CUDA Toolkit 12.8"; exit 1; }
+    sudo apt update || { echo "❌ Failed to update package list"; exit 1; }
+    echo "🔧 Installing CUDA Toolkit..."
+    sudo apt install -y cuda-toolkit || { echo "❌ Failed to install CUDA Toolkit"; exit 1; }
 
-    echo "✅ CUDA Toolkit 12.8 installed successfully."
+    echo "✅ CUDA Toolkit installed successfully."
     setup_cuda_env
 }
 
 # Set up CUDA environment variables
 setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
-    echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' | sudo tee /etc/profile.d/cuda.sh
-    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' | sudo tee -a /etc/profile.d/cuda.sh
-    source /etc/profile.d/cuda.sh
+    if ! grep -q "/usr/local/cuda/bin" /etc/profile.d/cuda.sh; then
+        echo 'export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}' | sudo tee -a /etc/profile.d/cuda.sh
+        echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' | sudo tee -a /etc/profile.d/cuda.sh
+    fi
 }
 
 # Install GaiaNet with appropriate CUDA support
