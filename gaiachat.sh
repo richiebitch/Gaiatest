@@ -399,7 +399,7 @@ EOF
     fi
 }
 
-API_KEY_DIR= ~/gaianet
+API_KEY_DIR= "$HOME"
 API_KEY_LIST=($(ls $API_KEY_DIR | grep '^apikey_'))  # List of saved API keys
 
 load_existing_key() {
