@@ -399,10 +399,17 @@ EOF
     fi
 }
 
-API_KEY_DIR= "$HOME"
-API_KEY_LIST=($(ls $API_KEY_DIR | grep '^apikey_'))  # List of saved API keys
+API_KEY_DIR="$HOME/gaianet"
+mkdir -p "$API_KEY_DIR"
+
+API_KEY_LIST=($(ls "$API_KEY_DIR" 2>/dev/null | grep '^apikey_'))
 
 load_existing_key() {
+    if [ ${#API_KEY_LIST[@]} -eq 0 ]; then
+        echo "❌ No existing API keys found."
+        return
+    fi
+
     echo "🔍 Detected existing API keys:"
     for i in "${!API_KEY_LIST[@]}"; do
         echo "$((i+1))) ${API_KEY_LIST[$i]}"
