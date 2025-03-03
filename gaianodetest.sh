@@ -29,6 +29,8 @@ printf "\n\n"
 GREEN="\033[0;32m"
 RESET="\033[0m"
 
+#!/bin/bash
+
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
 sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
@@ -149,35 +151,25 @@ setup_cuda_env() {
     source /etc/profile.d/cuda.sh
 }
 
-# Prompt user to select a GaiaNet node
-echo "Select the GaiaNet node to install:"
-echo "1) First Node (Default) - ~/gaianet"
-echo "2) Second Node - ~/gaianet1"
-echo "3) Third Node - ~/gaianet2"
-echo "4) Fourth Node - ~/gaianet3"
-read -p "Enter your choice (1-4): " NODE_CHOICE
+# Function to prompt user to select a GaiaNet node
+select_node() {
+    echo "Select the GaiaNet node to install:"
+    echo "1) First Node (Default) - ~/gaianet"
+    echo "2) Second Node - ~/gaianet1"
+    echo "3) Third Node - ~/gaianet2"
+    echo "4) Fourth Node - ~/gaianet3"
+    read -p "Enter your choice (1-4): " NODE_CHOICE
 
-# Assign BASE_DIR based on user selection
-case $NODE_CHOICE in
-    2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
-    3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
-    4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
-    *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
-esac
+    # Assign BASE_DIR and PORT based on user selection
+    case $NODE_CHOICE in
+        2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
+        3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
+        4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
+        *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
+    esac
 
-echo "📂 Installing GaiaNet in $BASE_DIR..."
-
-# Ensure required commands are available
-for cmd in curl bash; do
-    if ! command -v "$cmd" &> /dev/null; then
-        echo "❌ Error: '$cmd' is not installed. Please install it and try again."
-        exit 1
-    fi
-done
-
-# Create directory and navigate to it
-mkdir -p "$BASE_DIR"
-cd "$BASE_DIR" || { echo "❌ Failed to enter $BASE_DIR"; exit 1; }
+    echo "📂 Installing GaiaNet in $BASE_DIR..."
+}
 
 # Function to install GaiaNet
 install_gaianet() {
@@ -240,20 +232,42 @@ initialize_gaianet() {
     "$BASE_DIR/bin/gaianet" info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 }
 
+# Main function to orchestrate the script
 main() {
-    # Prompt user to select a GaiaNet node
-    echo "Select the GaiaNet node to install:"
-    echo "1) First Node (Default) - ~/gaianet"
-    echo "2) Second Node - ~/gaianet1"
-    echo "3) Third Node - ~/gaianet2"
-    echo "4) Fourth Node - ~/gaianet3"
-    read -p "Enter your choice (1-4): " NODE_CHOICE
+    # Step 1: Select the node
+    select_node
 
-echo "🎉 GaiaNet node successfully installed in $BASE_DIR!"
+    # Step 2: Install dependencies
+    echo "📦 Installing dependencies..."
+    sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
+    sudo apt upgrade -y && sudo apt update
 
-# Closing message
-echo "==========================================================="
-echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
-echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
-echo "💪 Together, let's build the future of decentralized networks!"
-echo "===========================================================" 
+    # Step 3: Check for NVIDIA GPU and install CUDA if available
+    if check_nvidia_gpu; then
+        setup_cuda_env
+        install_cuda
+    else
+        echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
+    fi
+
+    # Step 4: Install GaiaNet
+    if install_gaianet; then
+        verify_gaianet_installation
+    else
+        echo "❌ GaiaNet installation failed. Exiting."
+        exit 1
+    fi
+
+    # Step 5: Configure GaiaNet port
+    if configure_gaianet_port; then
+        initialize_gaianet
+    else
+        echo "❌ Failed to configure GaiaNet port. Exiting."
+        exit 1
+    fi
+
+    echo "🎉 GaiaNet node successfully installed in $BASE_DIR!"
+}
+
+# Call the main function to start the script
+main
