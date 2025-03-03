@@ -90,8 +90,6 @@ install_cuda() {
     if [ ! -f "$PIN_FILE" ]; then
         echo "📥 Downloading $PIN_FILE from $PIN_URL..."
         wget "$PIN_URL" || { echo "❌ Failed to download $PIN_FILE from $PIN_URL"; exit 1; }
-    else
-        echo "✅ $PIN_FILE already exists. Skipping download."
     fi
 
     # Move the .pin file to the correct location
@@ -101,8 +99,6 @@ install_cuda() {
     if [ ! -f "$DEB_FILE" ]; then
         echo "📥 Downloading $DEB_FILE from $DEB_URL..."
         wget "$DEB_URL" || { echo "❌ Failed to download $DEB_FILE from $DEB_URL"; exit 1; }
-    else
-        echo "✅ $DEB_FILE already exists. Skipping download."
     fi
 
     # Install the .deb file
