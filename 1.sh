@@ -93,7 +93,11 @@ install_cuda() {
     # Move the .pin file to the correct location
     sudo mv "$PIN_FILE" /etc/apt/preferences.d/cuda-repository-pin-600 || { echo "❌ Failed to move $PIN_FILE to /etc/apt/preferences.d/"; exit 1; }
 
-    # Download the .deb file
+    # Remove the .deb file if it exists, then download a fresh copy
+    if [ -f "$DEB_FILE" ]; then
+        echo "🗑️ Deleting existing $DEB_FILE..."
+        rm -f "$DEB_FILE"
+    fi
     echo "📥 Downloading $DEB_FILE from $DEB_URL..."
     wget "$DEB_URL" || { echo "❌ Failed to download $DEB_FILE from $DEB_URL"; exit 1; }
 
