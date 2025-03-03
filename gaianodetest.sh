@@ -210,13 +210,13 @@ verify_gaianet_installation() {
 # Function to add GaiaNet to PATH
 add_gaianet_to_path() {
     GAIA_PATH="export PATH=$BASE_DIR/bin:\$PATH"
-    if ! grep -Fxq "$GAIA_PATH" ~/.bashrc; then
-        echo "$GAIA_PATH" >> ~/.bashrc
+    if ! grep -Fxq "$GAIA_PATH" ~$BASE_DIR/.bashrc; then
+        echo "$GAIA_PATH" >> ~$BASE_DIR/.bashrc
         echo "✅ Added GaiaNet to PATH. Restart your terminal or run 'source ~/.bashrc'."
     else
         echo "ℹ️ GaiaNet is already in PATH."
     fi
-    source ~/.bashrc
+    source ~$BASE_DIR/.bashrc
 }
 
 # Function to configure GaiaNet port
