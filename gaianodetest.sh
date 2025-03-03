@@ -186,7 +186,7 @@ install_gaianet() {
         CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
         
-        if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
+        if [[ "$CUDA_VERSION" == "11"* || "$CUDA_VERSION" == "12"* ]]; then
             echo "🔧 Installing GaiaNet with CUDA support..."
             curl -sSfLO 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' || { echo "❌ Failed to download install.sh"; exit 1; }
             chmod +x install.sh
@@ -231,39 +231,23 @@ configure_gaianet_port() {
 # Function to initialize and start GaiaNet
 initialize_gaianet() {
     echo "⚙️ Initializing GaiaNet..."
-    "$BASE_DIR/bin" gaianet init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
     echo "🚀 Starting GaiaNet node..."
-    "$BASE_DIR/bin" gaianet start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
     echo "🔍 Fetching GaiaNet node information..."
-    "$BASE_DIR/bin" gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 }
 
 main() {
-    select_node  # Ask user which GaiaNet node to install
-
-    if check_nvidia_gpu; then
-        setup_cuda_env
-        install_cuda
-    else
-        echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
-    fi
-
-    if install_gaianet; then
-        verify_gaianet_installation
-    else
-        echo "❌ GaiaNet installation failed. Exiting."
-        exit 1
-    fi
-
-    if configure_gaianet_port; then
-        initialize_gaianet
-    else
-        echo "❌ Failed to configure GaiaNet port. Exiting."
-        exit 1
-    fi
-}
+    # Prompt user to select a GaiaNet node
+    echo "Select the GaiaNet node to install:"
+    echo "1) First Node (Default) - ~/gaianet"
+    echo "2) Second Node - ~/gaianet1"
+    echo "3) Third Node - ~/gaianet2"
+    echo "4) Fourth Node - ~/gaianet3"
+    read -p "Enter your choice (1-4): " NODE_CHOICE
 
 echo "🎉 GaiaNet node successfully installed in $BASE_DIR!"
 
