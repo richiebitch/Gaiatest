@@ -149,45 +149,48 @@ setup_cuda_env() {
     source /etc/profile.d/cuda.sh
 }
 
+# Prompt user to select a GaiaNet node
+echo "Select the GaiaNet node to install:"
+echo "1) First Node (Default) - ~/gaianet"
+echo "2) Second Node - ~/gaianet1"
+echo "3) Third Node - ~/gaianet2"
+echo "4) Fourth Node - ~/gaianet3"
+read -p "Enter your choice (1-4): " NODE_CHOICE
+
+# Assign BASE_DIR based on user selection
+case $NODE_CHOICE in
+    2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
+    3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
+    4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
+    *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
+esac
+
+echo "📂 Installing GaiaNet in $BASE_DIR..."
+
+# Ensure required commands are available
+for cmd in curl bash; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "❌ Error: '$cmd' is not installed. Please install it and try again."
+        exit 1
+    fi
+done
+
+# Create directory and navigate to it
+mkdir -p "$BASE_DIR"
+cd "$BASE_DIR" || { echo "❌ Failed to enter $BASE_DIR"; exit 1; }
+
+# Function to install GaiaNet
 install_gaianet() {
-    echo "Select the GaiaNet node to install:"
-    echo "1) First Node (Default) - ~/gaianet"
-    echo "2) Second Node - ~/gaianet1"
-    echo "3) Third Node - ~/gaianet2"
-    echo "4) Fourth Node - ~/gaianet3"
-    read -p "Enter your choice (1-4): " NODE_CHOICE
-
-    case $NODE_CHOICE in
-        2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
-        3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
-        4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
-        *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
-    esac
-
-    echo "📂 Installing GaiaNet in $BASE_DIR..."
-
-    # Ensure required packages are installed
-    for cmd in curl bash; do
-        if ! command -v "$cmd" &> /dev/null; then
-            echo "❌ Error: '$cmd' is not installed. Please install it and try again."
-            exit 1
-        fi
-    done
-
-    # Create directory and navigate
-    mkdir -p "$BASE_DIR"
-    cd "$BASE_DIR" || { echo "❌ Failed to enter $BASE_DIR"; exit 1; }
-
     # Check for CUDA support
     if command -v nvcc &> /dev/null; then
         CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
-
+        
         if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
-            echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
+            echo "🔧 Installing GaiaNet with CUDA support..."
             curl -sSfLO 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' || { echo "❌ Failed to download install.sh"; exit 1; }
             chmod +x install.sh
-            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
+            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
             return
         fi
     fi
@@ -210,13 +213,13 @@ verify_gaianet_installation() {
 # Function to add GaiaNet to PATH
 add_gaianet_to_path() {
     GAIA_PATH="export PATH=$BASE_DIR/bin:\$PATH"
-    if ! grep -Fxq "$GAIA_PATH" ~$BASE_DIR/.bashrc; then
-        echo "$GAIA_PATH" >> ~$BASE_DIR/.bashrc
+    if ! grep -Fxq "$GAIA_PATH" ~/.bashrc; then
+        echo "$GAIA_PATH" >> ~/.bashrc
         echo "✅ Added GaiaNet to PATH. Restart your terminal or run 'source ~/.bashrc'."
     else
         echo "ℹ️ GaiaNet is already in PATH."
     fi
-    source ~$BASE_DIR/.bashrc
+    source ~/.bashrc
 }
 
 # Function to configure GaiaNet port
@@ -227,34 +230,42 @@ configure_gaianet_port() {
 
 # Function to initialize and start GaiaNet
 initialize_gaianet() {
-    set_config_url
-
     echo "⚙️ Initializing GaiaNet..."
-    "$BASE_DIR/bin" init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    "$BASE_DIR/bin" init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
     echo "🚀 Starting GaiaNet node..."
-    "$BASE_DIR/bin" config --domain gaia.domains
     "$BASE_DIR/bin" start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
     echo "🔍 Fetching GaiaNet node information..."
     "$BASE_DIR/bin" info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 }
 
-# Main logic
-if check_nvidia_gpu; then
-    setup_cuda_env
-    install_cuda
-    setup_cuda_env
-    install_gaianet
-    verify_gaianet_installation
-    configure_gaianet_port
-    initialize_gaianet
-else
-    install_gaianet
-    verify_gaianet_installation
-    configure_gaianet_port
-    initialize_gaianet
-fi
+main() {
+    select_node  # Ask user which GaiaNet node to install
+
+    if check_nvidia_gpu; then
+        setup_cuda_env
+        install_cuda
+    else
+        echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
+    fi
+
+    if install_gaianet; then
+        verify_gaianet_installation
+    else
+        echo "❌ GaiaNet installation failed. Exiting."
+        exit 1
+    fi
+
+    if configure_gaianet_port; then
+        initialize_gaianet
+    else
+        echo "❌ Failed to configure GaiaNet port. Exiting."
+        exit 1
+    fi
+}
+
+echo "🎉 GaiaNet node successfully installed in $BASE_DIR!"
 
 # Closing message
 echo "==========================================================="
