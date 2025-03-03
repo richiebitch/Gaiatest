@@ -187,13 +187,13 @@ install_gaianet() {
             echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
             curl -sSfLO 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' || { echo "❌ Failed to download install.sh"; exit 1; }
             chmod +x install.sh
-            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" --port "$PORT" || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
+            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
             return
         fi
     fi
 
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" --port "$PORT" || { echo "❌ GaiaNet installation failed."; exit 1; }
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
 }
 
 # Function to verify installation
