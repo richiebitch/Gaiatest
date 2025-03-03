@@ -159,10 +159,10 @@ install_gaianet() {
     read -p "Enter your choice (1-4): " NODE_CHOICE
 
     case $NODE_CHOICE in
-        2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
-        3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
-        4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
-        *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
+        2) BASE_DIR="~/gaianet1"; PORT=8081 ;;
+        3) BASE_DIR="~/gaianet2"; PORT=8082 ;;
+        4) BASE_DIR="~/gaianet3"; PORT=8083 ;;
+        *) BASE_DIR="~/gaianet"; PORT=8080 ;;
     esac
 
     echo "Installing GaiaNet in $BASE_DIR..."
