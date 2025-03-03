@@ -225,7 +225,7 @@ add_gaianet_to_path() {
 # Function to configure GaiaNet port
 configure_gaianet_port() {
     echo "🔧 Configuring GaiaNet on port $PORT..."
-    "$BASE_DIR/bin" gaianet config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; exit 1; }
+    "$BASE_DIR/bin/gaianet" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; exit 1; }
 }
 
 # Function to initialize and start GaiaNet
