@@ -149,7 +149,6 @@ setup_cuda_env() {
     source /etc/profile.d/cuda.sh
 }
 
-# Function to install GaiaNet based on user selection
 install_gaianet() {
     echo "Select the GaiaNet node to install:"
     echo "1) First Node (Default) - ~/gaianet"
@@ -159,28 +158,42 @@ install_gaianet() {
     read -p "Enter your choice (1-4): " NODE_CHOICE
 
     case $NODE_CHOICE in
-        2) BASE_DIR="~/gaianet1"; PORT=8081 ;;
-        3) BASE_DIR="~/gaianet2"; PORT=8082 ;;
-        4) BASE_DIR="~/gaianet3"; PORT=8083 ;;
-        *) BASE_DIR="~/gaianet"; PORT=8080 ;;
+        2) BASE_DIR="$HOME/gaianet1"; PORT=8081 ;;
+        3) BASE_DIR="$HOME/gaianet2"; PORT=8082 ;;
+        4) BASE_DIR="$HOME/gaianet3"; PORT=8083 ;;
+        *) BASE_DIR="$HOME/gaianet"; PORT=8080 ;;
     esac
 
-    echo "Installing GaiaNet in $BASE_DIR..."
+    echo "📂 Installing GaiaNet in $BASE_DIR..."
 
+    # Ensure required packages are installed
+    for cmd in curl bash; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo "❌ Error: '$cmd' is not installed. Please install it and try again."
+            exit 1
+        fi
+    done
+
+    # Create directory and navigate
+    mkdir -p "$BASE_DIR"
+    cd "$BASE_DIR" || { echo "❌ Failed to enter $BASE_DIR"; exit 1; }
+
+    # Check for CUDA support
     if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | sed -n 's/.*release \([0-9]*\)\..*/\1/p')
+        CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
+
         if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
             curl -sSfLO 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' || { echo "❌ Failed to download install.sh"; exit 1; }
             chmod +x install.sh
-            ./install.sh --ggmlcuda $CUDA_VERSION --base "$BASE_DIR" || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
+            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" --port "$PORT" || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
             return
         fi
     fi
 
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" --port "$PORT" || { echo "❌ GaiaNet installation failed."; exit 1; }
 }
 
 # Function to verify installation
