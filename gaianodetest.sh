@@ -79,7 +79,7 @@ fi
 # Check if CUDA is already installed
 check_cuda_installed() {
     if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
+        CUDA_VERSION=$(nvcc --version | grep -oP 'release \K\d+\.\d+' | cut -d. -f1)
         echo "✅ CUDA version $CUDA_VERSION is already installed."
         return 0
     else
