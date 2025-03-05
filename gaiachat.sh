@@ -50,7 +50,7 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+            API_URL="https://gadao.gaia.domains/v1/chat/completions"
             API_NAME="Gadao"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
@@ -121,7 +121,7 @@ general_questions=(
     "How does statistics help in making informed decisions?"
 )
 
-    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
 general_questions=(
     "What is the capital of France?"
     "Who wrote 'Romeo and Juliet'?"
