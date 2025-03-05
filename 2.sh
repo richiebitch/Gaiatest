@@ -416,7 +416,10 @@ set_config_url
 # Install GaiaNet nodes
 for ((i=1; i<=NODE_COUNT; i++)); do
     install_gaianet_node "$i" "$CONFIG_URL"
+    set_config_url
 done
+# Determine the configuration URL based on system type and GPU availability
+set_config_url
             fi
             ;;
 
