@@ -307,6 +307,40 @@ display_node_info() {
     fi
 }
 
+# Function to check installed nodes
+check_installed_nodes() {
+    echo "🔍 Checking installed GaiaNet nodes..."
+
+    # Loop through all gaianet directories
+    for dir in "$HOME"/gaianet*; do
+        if [ -d "$dir" ]; then
+            # Extract node number from directory name
+            if [[ "$dir" == "$HOME/gaianet" ]]; then
+                NODE_NUMBER=0
+            else
+                NODE_NUMBER=$(echo "$dir" | grep -oP '(?<=gaianet)\d+')
+            fi
+
+            # Calculate port number
+            PORT=$((8080 + NODE_NUMBER))
+
+            # Check if the gaianet binary exists
+            if [ -f "$dir/bin/gaianet" ]; then
+                STATUS="✅ Installed"
+            else
+                STATUS="❌ Not Installed"
+            fi
+
+            # Display node information
+            echo "Node $NODE_NUMBER:"
+            echo "  Directory: $dir"
+            echo "  Port: $PORT"
+            echo "  Status: $STATUS"
+            echo "----------------------------------------"
+        fi
+    done
+}
+
 # Main menu
 while true; do
     clear
@@ -342,6 +376,7 @@ while true; do
     echo -e "8) \e[1;43m\e[97m⏹️  Stop GaiaNet Node\e[0m"
     echo -e "9) \e[1;46m\e[97m🔍  Check Your Gaia Node ID & Device ID\e[0m"
     echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
+    echo -e "11) \e[1;44m\e[97m📋  List Installed Nodes\e[0m"
     echo -e "0) \e[1;31m❌  Exit Installer\e[0m"
     echo "==============================================================="
     
@@ -443,6 +478,11 @@ while true; do
         fi
     fi
     ;;
+
+        11)
+            # Check installed nodes
+            check_installed_nodes
+            ;;
 
         0)
             echo "Exiting..."
