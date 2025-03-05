@@ -270,7 +270,7 @@ main() {
 
         # Assign unique directory and port
         BASE_DIR="$HOME/gaianet$i"
-        PORT=$((8080 + i - 1))
+        PORT=$((8081 + i - 1))
 
         # Step 5: Install GaiaNet
         install_gaianet "$BASE_DIR"
