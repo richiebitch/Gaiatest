@@ -109,9 +109,17 @@ set_config_url() {
 # Function to download and place the config.json file
 download_config() {
     local BASE_DIR=$1
+    local CONFIG_DIR="$BASE_DIR/config"
+    
+    # Create the config directory if it doesn't exist
+    if [ ! -d "$CONFIG_DIR" ]; then
+        echo "📂 Creating directory $CONFIG_DIR..."
+        mkdir -p "$CONFIG_DIR" || { echo "❌ Failed to create directory $CONFIG_DIR"; exit 1; }
+    fi
+
     echo "📥 Downloading config.json from $CONFIG_URL..."
-    wget -O "$BASE_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download config.json"; exit 1; }
-    echo "✅ config.json downloaded and placed in $BASE_DIR."
+    wget -O "$CONFIG_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download config.json"; exit 1; }
+    echo "✅ config.json downloaded and placed in $CONFIG_DIR."
 }
 
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
