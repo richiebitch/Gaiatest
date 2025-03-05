@@ -106,6 +106,14 @@ set_config_url() {
     echo "🔗 Using configuration: $CONFIG_URL"
 }
 
+# Function to download and place the config.json file
+download_config() {
+    local BASE_DIR=$1
+    echo "📥 Downloading config.json from $CONFIG_URL..."
+    wget -O "$BASE_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download config.json"; exit 1; }
+    echo "✅ config.json downloaded and placed in $BASE_DIR."
+}
+
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
     if $IS_WSL; then
@@ -279,10 +287,13 @@ main() {
         install_gaianet "$BASE_DIR" "$PORT"
         verify_gaianet_installation "$BASE_DIR"
 
-        # Step 6: Configure GaiaNet port
+        # Step 6: Download and place the config.json file
+        download_config "$BASE_DIR"
+
+        # Step 7: Configure GaiaNet port
         configure_gaianet_port "$BASE_DIR" "$PORT"
 
-        # Step 7: Initialize and start GaiaNet
+        # Step 8: Initialize and start GaiaNet
         initialize_gaianet "$BASE_DIR"
 
         echo "🎉 GaiaNet Node $i successfully installed in $BASE_DIR on port $PORT!"
