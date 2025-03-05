@@ -201,6 +201,7 @@ setup_cuda_env() {
 # Function to install GaiaNet with or without CUDA support
 install_gaianet() {
     local BASE_DIR=$1
+    local CONFIG_URL=$2
 
     # Create the base directory if it doesn't exist
     if [ ! -d "$BASE_DIR" ]; then
@@ -222,6 +223,10 @@ install_gaianet() {
 
     echo "⚠️ Installing GaiaNet without GPU support..."
     curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
+
+    # Download and apply the configuration file
+    echo "📥 Downloading configuration from $CONFIG_URL..."
+    wget -O "$BASE_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download configuration file."; exit 1; }
 }
 
 # Function to install GaiaNet node
@@ -405,10 +410,13 @@ while true; do
                     echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
                 fi
 
-                # Install GaiaNet nodes
-                for ((i=1; i<=NODE_COUNT; i++)); do
-                    install_gaianet_node "$i"
-                done
+# Determine the configuration URL based on system type and GPU availability
+set_config_url
+
+# Install GaiaNet nodes
+for ((i=1; i<=NODE_COUNT; i++)); do
+    install_gaianet_node "$i" "$CONFIG_URL"
+done
             fi
             ;;
 
