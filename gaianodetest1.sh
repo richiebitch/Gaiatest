@@ -359,8 +359,8 @@ case $choice in
         1|2|3)
             echo "How many nodes do you want to install? (1-4)"
             read -rp "Enter the number of nodes: " NODE_COUNT
-            if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_COUNT" =~ ^[0-3]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 3."
             else
                 # Check for NVIDIA GPU and install CUDA if available
                 if check_nvidia_gpu; then
