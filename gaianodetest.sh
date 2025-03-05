@@ -106,22 +106,6 @@ set_config_url() {
     echo "🔗 Using configuration: $CONFIG_URL"
 }
 
-# Function to download and place the config.json file
-download_config() {
-    local BASE_DIR=$1
-    local CONFIG_DIR="$BASE_DIR/config"
-    
-    # Create the config directory if it doesn't exist
-    if [ ! -d "$CONFIG_DIR" ]; then
-        echo "📂 Creating directory $CONFIG_DIR..."
-        mkdir -p "$CONFIG_DIR" || { echo "❌ Failed to create directory $CONFIG_DIR"; exit 1; }
-    fi
-
-    echo "📥 Downloading config.json from $CONFIG_URL..."
-    wget -O "$CONFIG_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download config.json"; exit 1; }
-    echo "✅ config.json downloaded and placed in $CONFIG_DIR."
-}
-
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
     if $IS_WSL; then
@@ -182,7 +166,6 @@ setup_cuda_env() {
 # Function to install GaiaNet
 install_gaianet() {
     local BASE_DIR=$1
-    local PORT=$2
 
     # Create the base directory if it doesn't exist
     if [ ! -d "$BASE_DIR" ]; then
@@ -197,9 +180,7 @@ install_gaianet() {
         
         if [[ "$CUDA_VERSION" == "11"* || "$CUDA_VERSION" == "12"* ]]; then
             echo "🔧 Installing GaiaNet with CUDA support..."
-            curl -sSfLO 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' || { echo "❌ Failed to download install.sh"; exit 1; }
-            chmod +x install.sh
-            ./install.sh --ggmlcuda "$CUDA_VERSION" --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" --ggmlcuda "$CUDA_VERSION" || { echo "❌ GaiaNet installation failed."; exit 1; }
             return
         fi
     fi
@@ -245,13 +226,13 @@ configure_gaianet_port() {
 initialize_gaianet() {
     local BASE_DIR=$1
     echo "⚙️ Initializing GaiaNet..."
-    "$BASE_DIR/bin/gaianet" init || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" init --base "$BASE_DIR" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
     echo "🚀 Starting GaiaNet node..."
-    "$BASE_DIR/bin/gaianet" start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
     echo "🔍 Fetching GaiaNet node information..."
-    "$BASE_DIR/bin/gaianet" info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
+    "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 }
 
 # Main function to orchestrate the script
@@ -292,16 +273,13 @@ main() {
         PORT=$((8080 + i - 1))
 
         # Step 5: Install GaiaNet
-        install_gaianet "$BASE_DIR" "$PORT"
+        install_gaianet "$BASE_DIR"
         verify_gaianet_installation "$BASE_DIR"
 
-        # Step 6: Download and place the config.json file
-        download_config "$BASE_DIR"
-
-        # Step 7: Configure GaiaNet port
+        # Step 6: Configure GaiaNet port
         configure_gaianet_port "$BASE_DIR" "$PORT"
 
-        # Step 8: Initialize and start GaiaNet
+        # Step 7: Initialize and start GaiaNet
         initialize_gaianet "$BASE_DIR"
 
         echo "🎉 GaiaNet Node $i successfully installed in $BASE_DIR on port $PORT!"
