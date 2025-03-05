@@ -395,17 +395,28 @@ while true; do
             fi
             ;;
 
-        10)
-            echo "⚠️ WARNING: This will completely remove GaiaNet Node from your system!"
-            read -rp "Are you sure you want to proceed? (y/n) " confirm
-            if [[ "$confirm" == "y" ]]; then
-                echo "🗑️ Uninstalling GaiaNet Node..."
-                curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/uninstall.sh' | bash
-                source ~/.bashrc
+ 10)
+    echo "Which node do you want to uninstall? (1-4)"
+    read -rp "Enter the node number: " NODE_NUMBER
+    if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+        echo "❌ Invalid input. Please enter a number between 1 and 4."
+    else
+        echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER from your system!"
+        read -rp "Are you sure you want to proceed? (y/n) " confirm
+        if [[ "$confirm" == "y" ]]; then
+            echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER..."
+            BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+            if [ -d "$BASE_DIR" ]; then
+                rm -rf "$BASE_DIR"
+                echo "✅ GaiaNet Node $NODE_NUMBER has been uninstalled."
             else
-                echo "Uninstallation aborted."
+                echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
             fi
-            ;;
+        else
+            echo "Uninstallation aborted."
+        fi
+    fi
+    ;;
 
         0)
             echo "Exiting..."
