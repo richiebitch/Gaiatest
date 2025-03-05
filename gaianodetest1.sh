@@ -364,8 +364,8 @@ case $choice in
             else
                 # Check for NVIDIA GPU and install CUDA if available
                 if check_nvidia_gpu; then
-                    if ! check_cuda_installed; then
-                        setup_cuda_env
+                    if ! setup_cuda_env; then
+                        check_cuda_installed
                         install_cuda
                     else
                         echo "⚠️ CUDA is already installed. Skipping CUDA installation."
