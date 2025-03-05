@@ -422,7 +422,7 @@ case $choice in
         9)
             echo "Which node do you want to check? (0-3)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-3]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 3."
             else
                 display_node_info "$NODE_NUMBER"
