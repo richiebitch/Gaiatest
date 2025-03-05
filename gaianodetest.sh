@@ -228,15 +228,20 @@ install_gaianet_node() {
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
-    # Install GaiaNet
-    install_gaianet "$BASE_DIR"
-
-    # Verify installation
+    # Check if GaiaNet is already installed
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
-        echo "✅ GaiaNet Node $NODE_NUMBER installed successfully in $BASE_DIR."
+        echo "ℹ️ GaiaNet is already installed in $BASE_DIR. Skipping installation."
     else
-        echo "❌ GaiaNet Node $NODE_NUMBER installation failed."
-        return 1
+        # Install GaiaNet
+        install_gaianet "$BASE_DIR"
+
+        # Verify installation
+        if [ -f "$BASE_DIR/bin/gaianet" ]; then
+            echo "✅ GaiaNet Node $NODE_NUMBER installed successfully in $BASE_DIR."
+        else
+            echo "❌ GaiaNet Node $NODE_NUMBER installation failed."
+            return 1
+        fi
     fi
 
     # Configure port
