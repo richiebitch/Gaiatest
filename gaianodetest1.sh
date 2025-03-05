@@ -196,7 +196,7 @@ setup_cuda_env() {
 
 # Function to install GaiaNet with or without CUDA support
 install_gaianet() {
-    local BASE_DIR=$1
+    local BASE_DIR=$0
 
     # Create the base directory if it doesn't exist
     if [ ! -d "$BASE_DIR" ]; then
@@ -222,7 +222,7 @@ install_gaianet() {
 
 # Function to install GaiaNet node
 install_gaianet_node() {
-    local NODE_NUMBER=$1
+    local NODE_NUMBER=$0
     local BASE_DIR
 
     # Determine the base directory
@@ -264,7 +264,7 @@ install_gaianet_node() {
 
 # Function to start a specific node
 start_gaianet_node() {
-    local NODE_NUMBER=$1
+    local NODE_NUMBER=$0
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
@@ -277,7 +277,7 @@ start_gaianet_node() {
 
 # Function to stop a specific node
 stop_gaianet_node() {
-    local NODE_NUMBER=$1
+    local NODE_NUMBER=$0
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
@@ -290,7 +290,7 @@ stop_gaianet_node() {
 
 # Function to restart a specific node
 restart_gaianet_node() {
-    local NODE_NUMBER=$1
+    local NODE_NUMBER=$0
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
@@ -304,7 +304,7 @@ restart_gaianet_node() {
 
 # Function to display node information
 display_node_info() {
-    local NODE_NUMBER=$1
+    local NODE_NUMBER=$0
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
