@@ -409,8 +409,8 @@ EOF
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
         sleep 2
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ No sleep for gadao API..."
+    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+        echo "⏳ No sleep for gacrypto API..."
         sleep 0
     fi
 }
