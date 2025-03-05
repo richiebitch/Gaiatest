@@ -1,60 +1,4 @@
-# Check for existing API keys
-API_KEY_DIR="/root/.gaianet_keys"
-mkdir -p "$API_KEY_DIR"
-
-EXISTING_KEYS=($(find "$API_KEY_DIR" -type f 2>/dev/null))
-
-if [ ${#EXISTING_KEYS[@]} -gt 0 ]; then
-    echo "Available API key files:"
-    select KEY_FILE in "${EXISTING_KEYS[@]}" "Enter a new API key"; do
-        if [[ "$KEY_FILE" == "Enter a new API key" ]]; then
-            break
-        elif [[ -n "$KEY_FILE" ]]; then
-            API_KEY=$(cat "$KEY_FILE")
-            echo "Using API key from: $KEY_FILE"
-            VALID_KEY=true
-            break
-        else
-            echo "Invalid selection. Try again."
-        fi
-    done
-fi
-
-# If no valid key was selected, ask for a new one
-if [ -z "$API_KEY" ] || [ "$VALID_KEY" != "true" ]; then
-    while true; do
-        read -p "Enter your GaiaNet API Key: " API_KEY
-        echo
-
-        if [ -z "$API_KEY" ]; then
-            echo "❌ Error: API Key is required!"
-            echo "🔄 Restarting the installer..."
-
-            # Restart the installer (only if running from gaiainstaller.sh)
-            if [[ $0 == *gaiainstaller.sh ]]; then
-                rm -rf ~/gaiainstaller.sh
-                curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh
-                chmod +x gaiainstaller.sh
-                exec ./gaiainstaller.sh  # Use exec to replace current process
-            else
-                exit 1
-            fi
-        else
-            break  # Exit loop if API key is provided
-        fi
-    done
-
-    # Save the new API key
-    read -p "Enter a name for the API key file: " FILE_NAME
-    API_KEY_FILE="$API_KEY_DIR/$FILE_NAME"
-
-    echo "$API_KEY" > "$API_KEY_FILE"
-    chmod 600 "$API_KEY_FILE"
-    echo "API Key saved as $API_KEY_FILE."
-fi
-
-# Continue script...
-echo "Starting GaiaNet with API Key: $API_KEY"
+#!/bin/bash
 
 # Function to check if NVIDIA CUDA or GPU is present
 check_cuda() {
@@ -138,59 +82,47 @@ fi
 generate_random_general_question() {
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
 general_questions=(
-    "What is the capital of France?"
-    "Who wrote 'Romeo and Juliet'?"
-    "What is the largest planet in the solar system?"
-    "What is the chemical symbol for water?"
-    "Who painted the Mona Lisa?"
-    "What is the smallest prime number?"
-    "What is the square root of 64?"
-    "What is the currency of Japan?"
-    "Who invented the telephone?"
-    "What is the longest river in the world?"
-    "What is the freezing point of water in Celsius?"
-    "What is the main gas found in Earth's atmosphere?"
-    "Who was the first president of the United States?"
-    "What is the capital of Australia?"
-    "What is the largest mammal in the world?"
-    "What is the chemical symbol for gold?"
-    "Who discovered gravity?"
-    "What is the capital of Canada?"
-    "What is the smallest continent by land area?"
-    "What is the capital of Italy?"
-    "What is the largest ocean on Earth?"
-    "What is the chemical symbol for oxygen?"
-    "Who wrote 'Hamlet'?"
-    "What is the capital of Germany?"
-    "What is the fastest land animal?"
-    "What is the capital of Brazil?"
-    "What is the chemical symbol for carbon?"
-    "Who was the first man to walk on the moon?"
-    "What is the capital of China?"
-    "What is the tallest mountain in the world?"
-    "Who discovered penicillin?"
-    "What is the largest country by land area?"
-    "Who wrote 'Pride and Prejudice'?"
-    "What is the smallest country in the world?"
-    "Who discovered electricity?"
-    "What is the largest bird in the world?"
-    "Who wrote 'War and Peace'?"
-    "What is the largest lake in the world?"
-    "Who discovered America?"
-    "What is the largest island in the world?"
-    "Who discovered the theory of relativity?"
-    "What is the largest reptile in the world?"
-    "Who wrote '1984'?"
-    "What is the largest fish in the world?"
-    "Who discovered the structure of DNA?"
-    "Who wrote 'The Divine Comedy'?"
-    "What is the largest marsupial in the world?"
-    "Who discovered the electron?"
-    "Who wrote 'The Republic'?"
-    "Who discovered the proton?"
+    "Why is the Renaissance considered a turning point in history?"
+    "How did the Industrial Revolution change the world?"
+    "Why is the Great Wall of China historically significant?"
+    "What were the main causes of World War I?"
+    "How did the printing press impact society?"
+    "Why is the moon landing in 1969 considered a major achievement?"
+    "What led to the fall of the Roman Empire?"
+    "How did the Cold War shape global politics?"
+    "Why is the Amazon rainforest important for the planet?"
+            "What sound does a cat make?"
+            "Which number comes after 4?"
+            "What is the opposite of 'hot'?"
+            "What do you use to brush your teeth?"
+            "What is the first letter of the alphabet?"
+            "What shape is a football?"
+            "How many fingers do humans have?"
+    "How do vaccines work to protect against diseases?"
+    "What are black holes, and why are they important in astronomy?"
+    "How does climate change affect ecosystems?"
+    "Why is the discovery of DNA considered revolutionary?"
+    "How did the internet change modern communication?"
+    "What role does the United Nations play in global peacekeeping?"
+    "Why is the Suez Canal important for global trade?"
+    "How did the Magna Carta influence modern democracy?"
+    "Why is the water cycle crucial for life on Earth?"
+    "What are the main challenges of space exploration?"
+    "How did the discovery of electricity transform society?"
+    "Why is the number zero important in mathematics?"
+    "How is the Fibonacci sequence observed in nature?"
+    "Why is the Pythagorean theorem significant in geometry?"
+    "How does probability influence real-life decision-making?"
+    "What are prime numbers, and why are they important in cryptography?"
+    "Why is calculus essential in modern science and engineering?"
+    "How does the concept of infinity affect mathematical theories?"
+    "What is the significance of Euler’s formula in mathematics?"
+    "Why is Pi considered an irrational number, and why is it useful?"
+    "How does statistics help in making informed decisions?"
 )
+
     elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
-  general_questions=(
+general_questions=(
     "What do you wear on your head when riding a bike?"
     "Which is the smallest country in the world by land area?"
     "What is the chemical symbol for gold?"
@@ -242,118 +174,57 @@ general_questions=(
     "How does a compass work to show direction?"
 )
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
-        general_questions=(
-            "Who is the current President of the United States?"
-            "What is the capital of Japan?"
-            "Which planet is known as the Red Planet?"
-            "Who wrote 'To Kill a Mockingbird'?"
-            "What is the largest ocean on Earth?"
-            "Which country has the most population?"
-            "What is the fastest land animal?"
-            "Who discovered gravity?"
-            "What color is the sky?"
-            "How many legs does a dog have?"
-            "What sound does a cat make?"
-            "Which number comes after 4?"
-            "What is the opposite of 'hot'?"
-            "What do you use to brush your teeth?"
-            "What is the first letter of the alphabet?"
-            "What shape is a football?"
-            "How many fingers do humans have?"
-            "What is 1 + 1?"
-            "What do you wear on your feet?"
-            "What animal says 'moo'?"
-            "How many eyes does a person have?"
-            "What do you call a baby dog?"
-            "Which fruit is yellow and curved?"
-            "What do you drink when you're thirsty?"
-            "What do bees make?"
-            "What is the name of our planet?"
-            "What do you do with a book?"
-            "What color is grass?"
-            "What is the opposite of 'up'?"
-            "How many wheels does a bicycle have?"
-            "Where do fish live?"
-            "What do you use to write on a blackboard?"
-            "What shape is a pizza?"
-            "What do you call a baby cat?"
-            "What is 5 minus 2?"
-            "What do you use to cut paper?"
-            "What is the color of a banana?"
-            "What do birds use to fly?"
-            "What do you wear on your head to keep warm?"
-            "How many days are in a week?"
-            "What do you use an umbrella for?"
-            "What does ice turn into when it melts?"
-            "How many ears does a rabbit have?"
-            "Which season comes after summer?"
-            "What color is the sun?"
-            "What do cows give us to drink?"
-            "Which fruit is red and has seeds inside?"
-            "What do you do with a bed?"
-            "What sound does a duck make?"
-            "How many toes do you have?"
-            "What do you call a baby chicken?"
-            "What do you put on your cereal?"
-            "Which is bigger, an elephant or a mouse?"
-            "What do you do with a spoon?"
-            "How many arms does an octopus have?"
-            "What is the color of a strawberry?"
-            "Which day comes after Monday?"
-            "What do you use to open a door?"
-            "What sound does a cow make?"
-            "Where do penguins live?"
-            "What do you call a baby horse?"
-            "What do you use to write on paper?"
-            "Which is faster, a car or a bicycle?"
-            "How many ears does a human have?"
-            "What do you wear on your hands when it’s cold?"
-            "What do you use to see things?"
-            "What do you do with a pillow?"
-            "How many arms does a starfish have?"
-            "What is the color of a lemon?"
-            "What do you call a house for birds?"
-            "Where do chickens live?"
-            "Which is taller, a giraffe or a cat?"
-            "What do you use to comb your hair?"
-            "What do you call a baby sheep?"
-            "How many hands does a clock have?"
-            "What do you call a place with lots of books?"
-            "Which animal has a long trunk?"
-            "What is the color of a watermelon?"
-            "What do you do with a TV?"
-            "What is the opposite of small?"
-            "How many sides does a triangle have?"
-            "What do you call a group of stars in the sky?"
-            "What do you use to eat soup?"
-            "What do you use to clean your hands?"
-            "What do monkeys love to eat?"
-            "Where do polar bears live?"
-            "What do you call a baby cow?"
-            "What does a clock show?"
-            "What do you wear when it’s raining?"
-            "What is something that barks?"
-            "What do you use to make a phone call?"
-            "What do you use to wash your hair?"
-            "What do you do with a blanket?"
-            "Which animal can hop and has a pouch?"
-            "What do you call a baby duck?"
-            "What do you use to tie your shoes?"
-            "How many wings does a butterfly have?"
-            "What do you wear to protect your eyes from the sun?"
-            "What do you do with a birthday cake?"
-            "What do you wear on your wrist to tell time?"
-            "What do you call a baby frog?"
-            "What do you eat for breakfast?"
-            "What do you do when you’re sleepy?"
-            "What is the color of the moon?"
-            "How many legs does a spider have?"
-            "Where do turtles live?"
-            "What do you do with a soccer ball?"
-            "What do you call a baby fish?"
-            "What do you wear on your head when riding a bike?"
-            "What do you do when you hear music?"
-        )
+  general_questions=(
+    "What do you wear on your head when riding a bike?"
+    "Which is the smallest country in the world by land area?"
+    "What is the chemical symbol for gold?"
+    "Who was the first President of the United States?"
+    "Which planet has the most moons in our solar system?"
+    "What is the hardest natural substance on Earth?"
+    "Which ocean is the largest by surface area?"
+    "Who wrote the play Romeo and Juliet?"
+    "What is the national currency of the United Kingdom?"
+    "Which element is necessary for breathing and survival?"
+    "What is the tallest mountain in the world?"
+    "Which is the largest desert in the world?"
+    "Who painted the famous artwork Mona Lisa?"
+    "What is the capital of Australia?"
+    "Which gas is most abundant in Earth's atmosphere?"
+    "Who discovered penicillin?"
+    "Which continent has the most countries?"
+    "What is the national flower of India?"
+    "How many bones are there in the adult human body?"
+    "Which bird is known for its ability to mimic human speech?"
+    "What is the currency of Japan?"
+    "Which is the longest wall in the world?"
+    "What is the main ingredient in traditional Japanese miso soup?"
+    "Which is the only planet that rotates on its side?"
+    "What is the name of the fairy tale character who leaves a glass slipper behind at a royal ball?"
+    "Who invented the light bulb?"
+    "Which country is famous for the Great Pyramids of Giza?"
+    "What is the chemical formula of water?"
+    "What is the fastest land animal in the world?"
+    "Who is known as the 'Father of Computers'?"
+    "Which two colors are on the flag of Canada?"
+    "Which planet is the hottest in the solar system?"
+    "Who wrote the famous book The Origin of Species?"
+    "What is the main language spoken in Brazil?"
+    "Which country is known as the Land of the Rising Sun?"
+    "What is the longest railway in the world?"
+    "Which element is represented by the symbol 'O' on the periodic table?"
+    "Which organ in the human body produces insulin?"
+    "What is the deepest ocean in the world?"
+    "Who was the first woman to win a Nobel Prize?"
+    "Which sport is played at Wimbledon?"
+    "Why do leaves change color in autumn?"
+    "What is the greenhouse effect and why is it important?"
+    "How do airplanes stay in the air despite their weight?"
+    "Why do we have different time zones around the world?"
+    "What causes tides in the ocean?"
+    "How does a rainbow form in the sky?"
+    "What is the purpose of the United Nations?"
+    "How does a compass work to show direction?"
+)
     fi
 
     echo "${general_questions[$RANDOM % ${#general_questions[@]}]}"
@@ -362,7 +233,7 @@ general_questions=(
 # Function to handle the API request
 send_request() {
     local message="$1"
-    local API_KEY_DIR="$2"
+    local api_key="$2"
 
     echo "📬 Sending Question to $API_NAME: $message"
 
@@ -377,7 +248,7 @@ EOF
     )
 
     response=$(curl -s -w "\n%{http_code}" -X POST "$API_URL" \
-        -H "Authorization: Bearer $API_KEY_DIR" \
+        -H "Authorization: Bearer $api_key" \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         -d "$json_data")
@@ -398,22 +269,96 @@ EOF
             echo "💬 Response: $response_message"
         fi
     else
-        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying..."
-        sleep 0
+        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
+        sleep 5
     fi
 
     # Set sleep time based on API URL
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ Sleeping for 2 seconds (hyper API)..."
-        sleep 2
+        echo "⏳ Fetching (hyper API)..."
+        sleep 1
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ Sleeping for 2 seconds (soneium API)..."
+        echo "⏳ Fetching (soneium API)..."
         sleep 2
     elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ No sleep for gacrypto API..."
-        sleep 0
+        echo "⏳ Fetching..."
+        sleep 1
     fi
 }
+
+API_KEY_DIR="$HOME/gaianet"
+mkdir -p "$API_KEY_DIR"
+
+API_KEY_LIST=($(ls "$API_KEY_DIR" 2>/dev/null | grep '^apikey_'))
+
+load_existing_key() {
+    if [ ${#API_KEY_LIST[@]} -eq 0 ]; then
+        echo "❌ No existing API keys found."
+        return
+    fi
+
+    echo "🔍 Detected existing API keys:"
+    for i in "${!API_KEY_LIST[@]}"; do
+        echo "$((i+1))) ${API_KEY_LIST[$i]}"
+    done
+
+    echo -n "👉 Select a key to load (Enter number): "
+    read -r key_choice
+
+    if [[ "$key_choice" =~ ^[0-9]+$ ]] && ((key_choice > 0 && key_choice <= ${#API_KEY_LIST[@]})); then
+        selected_file="${API_KEY_LIST[$((key_choice-1))]}"
+        api_key=$(cat "$API_KEY_DIR/$selected_file")
+        echo "✅ Loaded API key from $selected_file"
+    else
+        echo "❌ Invalid selection. Exiting..."
+        exit 1
+    fi
+}
+
+save_new_key() {
+    echo -n "Enter your API Key: "
+    read -r api_key
+
+    if [ -z "$api_key" ]; then
+        echo "❌ Error: API Key is required!"
+        exit 1
+    fi
+
+    while true; do
+        echo -n "Enter a name to save this key (no spaces): "
+        read -r key_name
+        key_name=$(echo "$key_name" | tr -d ' ')  # Remove spaces
+
+        if [ -z "$key_name" ]; then
+            echo "❌ Error: Name cannot be empty!"
+        elif [ -f "$API_KEY_DIR/apikey_$key_name" ]; then
+            echo "⚠️  A key with this name already exists! Choose a different name."
+        else
+            echo "$api_key" > "$API_KEY_DIR/apikey_$key_name"
+            chmod 600 "$API_KEY_DIR/apikey_$key_name"  # Secure the key file
+            echo "✅ API Key saved as 'apikey_$key_name'"
+            break
+        fi
+    done
+}
+
+# Main Logic
+if [ ${#API_KEY_LIST[@]} -gt 0 ]; then
+    echo "📂 Existing API keys detected."
+    echo "1) Load an existing API key"
+    echo "2) Enter a new API key"
+    echo -n "👉 Choose an option (1 or 2): "
+    read -r choice
+
+    case "$choice" in
+        1) load_existing_key ;;
+        2) save_new_key ;;
+        *) echo "❌ Invalid choice. Exiting..." && exit 1 ;;
+    esac
+else
+    echo "🔑 No saved API keys found. Please enter a new one."
+    save_new_key
+fi
 
 # Asking for duration
 echo -n "⏳ How many hours do you want the bot to run? "
@@ -444,9 +389,10 @@ while true; do
     if [[ "$elapsed" -ge "$max_duration" ]]; then
         echo "🛑 Time limit reached ($bot_hours hours). Exiting..."
         echo "📊 Total successful responses: $success_count"
+        sleep 100000
         exit 0
     fi
 
     random_message=$(generate_random_general_question)
-    send_request "$random_message" "$API_KEY_DIR"
+    send_request "$random_message" "$api_key"
 done
