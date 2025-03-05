@@ -206,7 +206,7 @@ install_gaianet() {
 
     # Check for CUDA support
     if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
+        CUDA_VERSION=$(nvcc --version | grep -oP 'release \K\d+\.\d+' | cut -d. -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
         
         if [[ "$CUDA_VERSION" == "11"* || "$CUDA_VERSION" == "12"* ]]; then
