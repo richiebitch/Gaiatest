@@ -31,33 +31,43 @@ RESET="\033[0m"
 
 #!/bin/bash
 
-# Ensure required packages are installed
-echo "📦 Installing dependencies..."
-sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
-sudo apt upgrade -y && sudo apt update
-
-# Detect if running inside WSL
-IS_WSL=false
-if grep -qi microsoft /proc/version; then
-    IS_WSL=true
-    echo "🖥️ Running inside WSL."
+# Check if sudo is installed
+if ! command -v sudo &> /dev/null; then
+    echo "❌ sudo is not installed. Installing sudo..."
+    apt update
+    apt install -y sudo
 else
-    echo "🖥️ Running on a native Ubuntu system."
+    echo "✅ sudo is already installed."
 fi
 
-# Check if CUDA is already installed
-check_cuda_installed() {
-    if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
-        echo "✅ CUDA version $CUDA_VERSION is already installed."
-        return 0
-    else
-        echo "⚠️ CUDA is not installed."
-        return 1
-    fi
-}
+# Check if screen is installed
+if ! command -v screen &> /dev/null; then
+    echo "❌ screen is not installed. Installing screen..."
+    sudo apt update
+    sudo apt install -y screen
+else
+    echo "✅ screen is already installed."
+fi
 
-# Check if an NVIDIA GPU is present
+# Check if net-tools is installed
+if ! command -v ifconfig &> /dev/null; then
+    echo "❌ net-tools is not installed. Installing net-tools..."
+    sudo apt install -y net-tools
+else
+    echo "✅ net-tools is already installed."
+fi
+
+# Check if lsof is installed
+if ! command -v lsof &> /dev/null; then
+    echo "❌ lsof is not installed. Installing lsof..."
+    sudo apt update
+    sudo apt install -y lsof
+    sudo apt upgrade -y
+else
+    echo "✅ lsof is already installed."
+fi
+
+# Function to check if an NVIDIA GPU is present
 check_nvidia_gpu() {
     if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
         echo "✅ NVIDIA GPU detected."
@@ -68,7 +78,7 @@ check_nvidia_gpu() {
     fi
 }
 
-# Check if the system is a VPS, Laptop, or Desktop
+# Function to check if the system is a VPS, Laptop, or Desktop
 check_system_type() {
     vps_type=$(systemd-detect-virt)
     if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
@@ -163,7 +173,7 @@ setup_cuda_env() {
     source /etc/profile.d/cuda.sh
 }
 
-# Function to install GaiaNet
+# Function to install GaiaNet with or without CUDA support
 install_gaianet() {
     local BASE_DIR=$1
 
@@ -189,102 +199,223 @@ install_gaianet() {
     curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
 }
 
-# Function to verify installation
-verify_gaianet_installation() {
-    local BASE_DIR=$1
+# Function to install GaiaNet node
+install_gaianet_node() {
+    local NODE_NUMBER=$1
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+    local PORT=$((8080 + NODE_NUMBER - 1))
+
+    echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
+
+    # Install GaiaNet
+    install_gaianet "$BASE_DIR"
+
+    # Verify installation
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
-        echo "✅ GaiaNet installed successfully in $BASE_DIR."
-        add_gaianet_to_path "$BASE_DIR"
+        echo "✅ GaiaNet Node $NODE_NUMBER installed successfully in $BASE_DIR."
     else
-        echo "❌ GaiaNet installation failed. Exiting."
-        exit 1
+        echo "❌ GaiaNet Node $NODE_NUMBER installation failed."
+        return 1
     fi
+
+    # Configure port
+    "$BASE_DIR/bin/gaianet" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; return 1; }
+
+    # Initialize and start the node
+    "$BASE_DIR/bin/gaianet" init --base "$BASE_DIR" || { echo "❌ GaiaNet initialization failed!"; return 1; }
+    "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+
+    echo "🎉 GaiaNet Node $NODE_NUMBER successfully installed and started in $BASE_DIR on port $PORT!"
 }
 
-# Function to add GaiaNet to PATH
-add_gaianet_to_path() {
-    local BASE_DIR=$1
-    GAIA_PATH="export PATH=$BASE_DIR/bin:\$PATH"
-    if ! grep -Fxq "$GAIA_PATH" ~/.bashrc; then
-        echo "$GAIA_PATH" >> ~/.bashrc
-        echo "✅ Added GaiaNet to PATH. Restart your terminal or run 'source ~/.bashrc'."
+# Function to start a specific node
+start_gaianet_node() {
+    local NODE_NUMBER=$1
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+
+    if [ -f "$BASE_DIR/bin/gaianet" ]; then
+        echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
+        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
     else
-        echo "ℹ️ GaiaNet is already in PATH."
+        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
-    source ~/.bashrc
 }
 
-# Function to configure GaiaNet port
-configure_gaianet_port() {
-    local BASE_DIR=$1
-    local PORT=$2
-    echo "🔧 Configuring GaiaNet on port $PORT..."
-    "$BASE_DIR/bin/gaianet" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; exit 1; }
-}
+# Function to stop a specific node
+stop_gaianet_node() {
+    local NODE_NUMBER=$1
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
-# Function to initialize and start GaiaNet
-initialize_gaianet() {
-    local BASE_DIR=$1
-    echo "⚙️ Initializing GaiaNet..."
-    "$BASE_DIR/bin/gaianet" init --base "$BASE_DIR" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
-
-    echo "🚀 Starting GaiaNet node..."
-    "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
-
-    echo "🔍 Fetching GaiaNet node information..."
-    "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
-}
-
-# Main function to orchestrate the script
-main() {
-    # Prompt user for the number of nodes to install
-    read -p "Enter the number of GaiaNet nodes to install (1-4): " NODE_COUNT
-    if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
-        echo "❌ Invalid input. Please enter a number between 1 and 4."
-        exit 1
-    fi
-
-    # Step 1: Install dependencies
-    echo "📦 Installing dependencies..."
-    sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config libopenblas-dev libomp-dev
-    sudo apt upgrade -y && sudo apt update
-
-    # Step 2: Check for NVIDIA GPU and install CUDA if available and not already installed
-    if check_nvidia_gpu; then
-        if ! check_cuda_installed; then
-            setup_cuda_env
-            install_cuda
-        else
-            echo "⚠️ CUDA is already installed. Skipping CUDA installation."
-        fi
+    if [ -f "$BASE_DIR/bin/gaianet" ]; then
+        echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
+        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
     else
-        echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
+        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
-
-    # Step 3: Set configuration URL based on system type
-    set_config_url
-
-    # Step 4: Install and configure each node
-    for ((i=1; i<=NODE_COUNT; i++)); do
-        echo "🔧 Setting up GaiaNet Node $i..."
-
-        # Assign unique directory and port
-        BASE_DIR="$HOME/gaianet$i"
-        PORT=$((8081 + i - 1))
-
-        # Step 5: Install GaiaNet
-        install_gaianet "$BASE_DIR"
-        verify_gaianet_installation "$BASE_DIR"
-
-        # Step 6: Configure GaiaNet port
-        configure_gaianet_port "$BASE_DIR" "$PORT"
-
-        # Step 7: Initialize and start GaiaNet
-        initialize_gaianet "$BASE_DIR"
-
-        echo "🎉 GaiaNet Node $i successfully installed in $BASE_DIR on port $PORT!"
-    done
 }
 
-# Call the main function to start the script
-main
+# Function to restart a specific node
+restart_gaianet_node() {
+    local NODE_NUMBER=$1
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+
+    if [ -f "$BASE_DIR/bin/gaianet" ]; then
+        echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
+        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+    else
+        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+    fi
+}
+
+# Function to display node information
+display_node_info() {
+    local NODE_NUMBER=$1
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+
+    if [ -f "$BASE_DIR/bin/gaianet" ]; then
+        echo "🔍 Information for GaiaNet Node $NODE_NUMBER:"
+        "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch node information!"; return 1; }
+    else
+        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+    fi
+}
+
+# Main menu
+while true; do
+    clear
+    echo "==============================================================="
+    echo -e "\e[1;36m🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀\e[0m"
+
+    echo -e "\e[1;85m📢 Stay updated:\e[0m"
+    echo -e "\e[1;85m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
+    echo -e "\e[1;85m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
+
+    echo "==============================================================="
+    echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter a Lot for Optimal Performance! ✨\e[0m"
+    echo "==============================================================="
+    
+    # Performance & Requirement Section
+    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
+    echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
+    echo -e "\e[1;94m☁️  VPS Requirements: 8 Core+ CPU & 6-8GB RAM (Higher is Better) ⚡\e[0m"
+    echo -e "\e[1;92m💻  Supported GPUs: RTX 20/30/40/50 Series Or Higher 🟢\e[0m"
+    echo "==============================================================="
+    echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
+    echo "==============================================================="
+    
+    # Menu Options
+    echo -e "\n\e[1mSelect an action:\e[0m\n"
+    echo -e "1) \e[1;46m\e[97m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
+    echo -e "2) \e[1;45m\e[97m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
+    echo -e "3) \e[1;44m\e[97m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
+    echo -e "4) \e[1;42m\e[97m🤖  Start Auto Chat With Ai-Agent\e[0m"
+    echo -e "5) \e[1;100m\e[97m🔍  Switch to Active Screens\e[0m"
+    echo -e "6) \e[1;41m\e[97m✋  Stop Auto Chatting With Ai-Agent\e[0m"
+    echo -e "7) \e[1;43m\e[97m🔄  Restart GaiaNet Node\e[0m"
+    echo -e "8) \e[1;43m\e[97m⏹️  Stop GaiaNet Node\e[0m"
+    echo -e "9) \e[1;46m\e[97m🔍  Check Your Gaia Node ID & Device ID\e[0m"
+    echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
+    echo -e "0) \e[1;31m❌  Exit Installer\e[0m"
+    echo "==============================================================="
+    
+    read -rp "Enter your choice: " choice
+
+    case $choice in
+        1|2|3)
+            echo "How many nodes do you want to install? (1-4)"
+            read -rp "Enter the number of nodes: " NODE_COUNT
+            if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            else
+                # Check for NVIDIA GPU and install CUDA if available
+                if check_nvidia_gpu; then
+                    if ! check_cuda_installed; then
+                        setup_cuda_env
+                        install_cuda
+                    else
+                        echo "⚠️ CUDA is already installed. Skipping CUDA installation."
+                    fi
+                else
+                    echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
+                fi
+
+                # Install GaiaNet nodes
+                for ((i=1; i<=NODE_COUNT; i++)); do
+                    install_gaianet_node "$i"
+                done
+            fi
+            ;;
+
+        4)
+            # Start Auto Chat With Ai-Agent
+            echo "Starting Auto Chat With Ai-Agent..."
+            # Add your logic here
+            ;;
+
+        5)
+            # Switch to Active Screens
+            echo "Switching to Active Screens..."
+            # Add your logic here
+            ;;
+
+        6)
+            # Stop Auto Chatting With Ai-Agent
+            echo "Stopping Auto Chatting With Ai-Agent..."
+            # Add your logic here
+            ;;
+
+        7)
+            echo "Which node do you want to restart? (1-4)"
+            read -rp "Enter the node number: " NODE_NUMBER
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            else
+                restart_gaianet_node "$NODE_NUMBER"
+            fi
+            ;;
+
+        8)
+            echo "Which node do you want to stop? (1-4)"
+            read -rp "Enter the node number: " NODE_NUMBER
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            else
+                stop_gaianet_node "$NODE_NUMBER"
+            fi
+            ;;
+
+        9)
+            echo "Which node do you want to check? (1-4)"
+            read -rp "Enter the node number: " NODE_NUMBER
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            else
+                display_node_info "$NODE_NUMBER"
+            fi
+            ;;
+
+        10)
+            echo "⚠️ WARNING: This will completely remove GaiaNet Node from your system!"
+            read -rp "Are you sure you want to proceed? (y/n) " confirm
+            if [[ "$confirm" == "y" ]]; then
+                echo "🗑️ Uninstalling GaiaNet Node..."
+                curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/uninstall.sh' | bash
+                source ~/.bashrc
+            else
+                echo "Uninstallation aborted."
+            fi
+            ;;
+
+        0)
+            echo "Exiting..."
+            exit 0
+            ;;
+
+        *)
+            echo "Invalid choice. Please try again."
+            ;;
+    esac
+
+    read -rp "Press Enter to return to the main menu..."
+done
