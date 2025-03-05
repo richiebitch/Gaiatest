@@ -203,7 +203,7 @@ install_gaianet() {
 install_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local PORT=$((8080 + NODE_NUMBER - 1))
+    local PORT=$((8081 + NODE_NUMBER - 1))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
