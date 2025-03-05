@@ -402,7 +402,7 @@ case $choice in
         7)
             echo "Which node do you want to restart? (0-3)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-3]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 3."
             else
                 restart_gaianet_node "$NODE_NUMBER"
@@ -412,7 +412,7 @@ case $choice in
         8)
             echo "Which node do you want to stop? (0-3)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-3]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 3."
             else
                 stop_gaianet_node "$NODE_NUMBER"
@@ -432,7 +432,7 @@ case $choice in
         10)
             echo "Which node do you want to uninstall? (0-3)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-3]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 3."
             else
                 echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER from your system!"
