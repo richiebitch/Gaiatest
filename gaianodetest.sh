@@ -68,6 +68,44 @@ check_nvidia_gpu() {
     fi
 }
 
+# Check if the system is a VPS, Laptop, or Desktop
+check_system_type() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0  # VPS
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 1  # Laptop
+    else
+        echo "✅ This is a Desktop."
+        return 2  # Desktop
+    fi
+}
+
+# Function to determine system type and set config URL
+set_config_url() {
+    check_system_type
+    SYSTEM_TYPE=$?  # Capture the return value of check_system_type
+
+    if [[ $SYSTEM_TYPE -eq 0 ]]; then
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+    elif [[ $SYSTEM_TYPE -eq 1 ]]; then
+        if ! check_nvidia_gpu; then
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+        else
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+        fi
+    elif [[ $SYSTEM_TYPE -eq 2 ]]; then
+        if ! check_nvidia_gpu; then
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+        else
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
+        fi
+    fi
+    echo "🔗 Using configuration: $CONFIG_URL"
+}
+
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
     if $IS_WSL; then
@@ -226,7 +264,10 @@ main() {
         echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
     fi
 
-    # Step 3: Install and configure each node
+    # Step 3: Set configuration URL based on system type
+    set_config_url
+
+    # Step 4: Install and configure each node
     for ((i=1; i<=NODE_COUNT; i++)); do
         echo "🔧 Setting up GaiaNet Node $i..."
 
@@ -234,14 +275,14 @@ main() {
         BASE_DIR="$HOME/gaianet$i"
         PORT=$((8080 + i - 1))
 
-        # Step 4: Install GaiaNet
+        # Step 5: Install GaiaNet
         install_gaianet "$BASE_DIR" "$PORT"
         verify_gaianet_installation "$BASE_DIR"
 
-        # Step 5: Configure GaiaNet port
+        # Step 6: Configure GaiaNet port
         configure_gaianet_port "$BASE_DIR" "$PORT"
 
-        # Step 6: Initialize and start GaiaNet
+        # Step 7: Initialize and start GaiaNet
         initialize_gaianet "$BASE_DIR"
 
         echo "🎉 GaiaNet Node $i successfully installed in $BASE_DIR on port $PORT!"
