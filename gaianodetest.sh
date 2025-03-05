@@ -68,44 +68,6 @@ check_nvidia_gpu() {
     fi
 }
 
-# Function to determine system type and set config URL
-set_config_url() {
-    check_system_type
-    SYSTEM_TYPE=$?  # Capture the return value of check_system_type
-
-    if [[ $SYSTEM_TYPE -eq 0 ]]; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-    elif [[ $SYSTEM_TYPE -eq 1 ]]; then
-        if ! check_nvidia_gpu; then
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-        fi
-    elif [[ $SYSTEM_TYPE -eq 2 ]]; then
-        if ! check_nvidia_gpu; then
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
-        fi
-    fi
-    echo "🔗 Using configuration: $CONFIG_URL"
-}
-
-# Check if the system is a VPS, Laptop, or Desktop
-check_system_type() {
-    vps_type=$(systemd-detect-virt)
-    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-        echo "✅ This is a VPS."
-        return 0  # VPS
-    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-        echo "✅ This is a Laptop."
-        return 1  # Laptop
-    else
-        echo "✅ This is a Desktop."
-        return 2  # Desktop
-    fi
-}
-
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
     if $IS_WSL; then
@@ -167,6 +129,12 @@ setup_cuda_env() {
 install_gaianet() {
     local BASE_DIR=$1
     local PORT=$2
+
+    # Create the base directory if it doesn't exist
+    if [ ! -d "$BASE_DIR" ]; then
+        echo "📂 Creating directory $BASE_DIR..."
+        mkdir -p "$BASE_DIR" || { echo "❌ Failed to create directory $BASE_DIR"; exit 1; }
+    fi
 
     # Check for CUDA support
     if command -v nvcc &> /dev/null; then
