@@ -67,6 +67,27 @@ else
     echo "✅ lsof is already installed."
 fi
 
+# Detect if running inside WSL
+IS_WSL=false
+if grep -qi microsoft /proc/version; then
+    IS_WSL=true
+    echo "🖥️ Running inside WSL."
+else
+    echo "🖥️ Running on a native Ubuntu system."
+fi
+
+# Check if CUDA is already installed
+check_cuda_installed() {
+    if command -v nvcc &> /dev/null; then
+        CUDA_VERSION=$(nvcc --version | awk '/release/ {print $NF}' | cut -d. -f1)
+        echo "✅ CUDA version $CUDA_VERSION is already installed."
+        return 0
+    else
+        echo "⚠️ CUDA is not installed."
+        return 1
+    fi
+}
+
 # Function to check if an NVIDIA GPU is present
 check_nvidia_gpu() {
     if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
