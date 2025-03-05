@@ -118,6 +118,7 @@ check_system_type() {
 set_config_url() {
     check_system_type
     SYSTEM_TYPE=$?  # Capture the return value of check_system_type
+    echo "🔧 Detected System Type: $SYSTEM_TYPE"
 
     if [[ $SYSTEM_TYPE -eq 0 ]]; then
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
@@ -133,6 +134,9 @@ set_config_url() {
         else
             CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
         fi
+    else
+        echo "⚠️ Unable to determine system type. Using default configuration."
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
     fi
     echo "🔗 Using configuration: $CONFIG_URL"
 }
@@ -223,6 +227,7 @@ install_gaianet() {
 # Function to install GaiaNet node
 install_gaianet_node() {
     local NODE_NUMBER=$1
+    local CONFIG_URL=$2
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
     local PORT=$((8081 + NODE_NUMBER - 1))
 
@@ -232,8 +237,8 @@ install_gaianet_node() {
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "ℹ️ GaiaNet is already installed in $BASE_DIR. Skipping installation."
     else
-        # Install GaiaNet
-        install_gaianet "$BASE_DIR"
+        # Install GaiaNet with the provided CONFIG_URL
+        install_gaianet "$BASE_DIR" "$CONFIG_URL"
 
         # Verify installation
         if [ -f "$BASE_DIR/bin/gaianet" ]; then
@@ -253,7 +258,6 @@ install_gaianet_node() {
 
     echo "🎉 GaiaNet Node $NODE_NUMBER successfully installed and started in $BASE_DIR on port $PORT!"
 }
-
 # Function to start a specific node
 start_gaianet_node() {
     local NODE_NUMBER=$1
