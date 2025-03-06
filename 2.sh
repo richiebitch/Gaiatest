@@ -454,14 +454,19 @@ check_port() {
 
 # Function to check if the system is a VPS, laptop, or desktop
 check_if_vps_or_laptop() {
+    echo "🔍 Detecting system type..."
+    
     # Check for virtualization (VPS)
     if grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/cpuinfo || grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/meminfo; then
         echo "✅ This is a VPS."
+        return 0
     # Check for battery (Laptop)
     elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
         echo "✅ This is a Laptop."
+        return 1
     else
         echo "✅ This is a Desktop."
+        return 2
     fi
 }
 
@@ -528,7 +533,13 @@ fi
 echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
 
 # Determine the appropriate script based on system type
-if check_if_vps_or_laptop; then
+echo "🔍 Determining system type..."
+check_if_vps_or_laptop
+SYSTEM_TYPE=$?
+
+if [[ $SYSTEM_TYPE -eq 0 ]]; then
+    script_name="gaiachat.sh"
+elif [[ $SYSTEM_TYPE -eq 1 ]]; then
     script_name="gaiachat.sh"
 else
     if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
