@@ -291,7 +291,7 @@ install_gaianet_node() {
 
     # Set the base directory and port based on the node number
     BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
-    PORT=$((8080 + NODE_NUMBER))
+    PORT=$((8081 + NODE_NUMBER))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
