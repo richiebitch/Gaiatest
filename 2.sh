@@ -467,53 +467,31 @@ check_if_vps_or_laptop() {
 # Main script logic
 echo "Detecting system configuration..."
 
-# Check if at least one GaiaNet node is installed and properly configured
-at_least_one_node_configured=0
+# Check if at least one GaiaNet node is installed
+at_least_one_node_installed=0
 
 for ((i=1; i<=4; i++)); do
     BASE_DIR="$HOME/gaianet$i"
-    PORT=$((8080 + i))
 
-    # Check if the node directory exists
-    if [ -d "$BASE_DIR" ]; then
-        echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR...\e[0m"
-
-        # Check if the gaianet binary exists in the BASE_DIR
-        if ! command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
-            echo -e "\e[1;31m❌ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
-            continue
-        fi
-
-        # Check if GaiaNet is properly configured
-        gaianet_info=$("$BASE_DIR/bin/gaianet" info 2>/dev/null)
-        if [[ -z "$gaianet_info" ]]; then
-            echo -e "\e[1;31m❌ GaiaNet in $BASE_DIR is installed but not configured properly.\e[0m"
-            echo -e "\e[1;33m🔍 Uninstall & Re-install Node $i.\e[0m"
-            continue
-        fi
-
-        # If Node ID or Device ID is found, the node is properly configured
-        if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-            echo -e "\e[1;32m✅ Node $i is properly configured.\e[0m"
-            at_least_one_node_configured=$((at_least_one_node_configured + 1))
-        else
-            echo -e "\e[1;31m❌ Node $i is not configured properly.\e[0m"
-        fi
+    # Check if the gaianet binary exists in the BASE_DIR
+    if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
+        echo -e "\e[1;32m✅ GaiaNet binary found in $BASE_DIR/bin.\e[0m"
+        at_least_one_node_installed=$((at_least_one_node_installed + 1))
     else
-        echo -e "\e[1;33m⚠️ Node $i directory ($BASE_DIR) does not exist.\e[0m"
+        echo -e "\e[1;31m❌ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
     fi
 done
 
-# If no nodes are properly configured, exit
-if [ $at_least_one_node_configured -eq 0 ]; then
-    echo -e "\e[1;31m❌ No GaiaNet nodes are properly installed and configured.\e[0m"
-    echo -e "\e[1;33m🔍 Please install and configure at least one node.\e[0m"
+# If no nodes are installed, exit
+if [ $at_least_one_node_installed -eq 0 ]; then
+    echo -e "\e[1;31m❌ No GaiaNet nodes are installed.\e[0m"
+    echo -e "\e[1;33m🔍 Please install at least one node.\e[0m"
     read -r -p "Press Enter to return to the main menu..."
     continue
 fi
 
-# Proceed if at least one node is properly configured
-echo -e "\e[1;32m✅ At least one GaiaNet node is properly configured. Proceeding with chatbot setup.\e[0m"
+# Proceed if at least one node is installed
+echo -e "\e[1;32m✅ At least one GaiaNet node is installed. Proceeding with chatbot setup.\e[0m"
 
 # Check if at least one of the ports is active
 at_least_one_port_active=0
@@ -523,8 +501,8 @@ for ((i=1; i<=4; i++)); do
     BASE_DIR="$HOME/gaianet$i"
     PORT=$((8080 + i))
 
-    # Check if the node directory exists
-    if [ -d "$BASE_DIR" ]; then
+    # Check if the gaianet binary exists in the BASE_DIR
+    if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
         echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR on port $PORT...\e[0m"
         if check_port $PORT; then
             at_least_one_port_active=$((at_least_one_port_active + 1))
@@ -533,7 +511,7 @@ for ((i=1; i<=4; i++)); do
             echo -e "\e[1;31m❌ Node $i is not running on port $PORT.\e[0m"
         fi
     else
-        echo -e "\e[1;33m⚠️ Node $i directory ($BASE_DIR) does not exist.\e[0m"
+        echo -e "\e[1;33m⚠️ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
     fi
 done
 
