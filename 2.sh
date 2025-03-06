@@ -552,10 +552,14 @@ else
 fi
 
 # Start the chatbot in a detached screen session
+echo "🚀 Starting chatbot in a detached screen session..."
 screen -dmS gaiabot bash -c '
+echo "🔍 Starting chatbot script..."
 curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
 if [ -f "'"$script_name"'" ]; then
+    echo "🔍 Executing chatbot script..."
     ./'"$script_name"' > gaiabot.log 2>&1
+    echo "🔍 Chatbot script execution complete."
 else
     echo "❌ Error: Failed to download '"$script_name"'"
     sleep 10
