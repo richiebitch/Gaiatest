@@ -3,22 +3,66 @@
 # Function to check if NVIDIA CUDA or GPU is present
 check_cuda() {
     if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-        echo "✅ NVIDIA GPU with CUDA detected. Proceeding with execution..."
+        echo "✅ NVIDIA GPU with CUDA detected."
+        return 0  # CUDA is present
     else
-        echo "❌ NVIDIA GPU Not Found. This Bot is Only for GPU Users."
-        echo "Press Enter to go back and Run on GPU Device..."  
-        read -r  # Waits for user input
-
-        # Restart installer
-        rm -rf ~/gaiainstaller.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
-
-        exit 1
+        echo "❌ NVIDIA GPU Not Found."
+        return 1  # CUDA is not present
     fi
 }
 
-# Run the check
-check_cuda
+# Function to check if the system is a VPS, Laptop, or Desktop
+check_system_type() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0  # VPS
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 1  # Laptop
+    else
+        echo "✅ This is a Desktop."
+        return 2  # Desktop
+    fi
+}
+
+# Function to set the API URL based on system type and CUDA presence
+set_api_url() {
+    check_system_type
+    system_type=$?
+
+    check_cuda
+    cuda_present=$?
+
+    if [ "$system_type" -eq 0 ]; then
+        # VPS
+        API_URL="https://hyper.gaia.domains/v1/chat/completions"
+        API_NAME="Hyper"
+    elif [ "$system_type" -eq 1 ]; then
+        # Laptop
+        if [ "$cuda_present" -eq 0 ]; then
+            API_URL="https://soneium.gaia.domains/v1/chat/completions"
+            API_NAME="Soneium"
+        else
+            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_NAME="Hyper"
+        fi
+    elif [ "$system_type" -eq 2 ]; then
+        # Desktop
+        if [ "$cuda_present" -eq 0 ]; then
+            API_URL="https://gadao.gaia.domains/v1/chat/completions"
+            API_NAME="Gadao"
+        else
+            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_NAME="Hyper"
+        fi
+    fi
+
+    echo "🔗 Using API: ($API_NAME)"
+}
+
+# Set the API URL based on system type and CUDA presence
+set_api_url
 
 # Check if jq is installed, and if not, install it
 if ! command -v jq &> /dev/null; then
@@ -34,101 +78,28 @@ else
     echo "✅ jq is already installed."
 fi
 
-# List of general questions
-general_questions=(
-    "What are black holes, and how do they form?"
-    "Explain the causes and effects of global warming."
-    "What were the main causes of World War II?"
-    "How does the human brain process information and memory?"
-    "What is artificial intelligence, and how is it impacting modern society?"
-    "Explain the process of photosynthesis and its importance in the ecosystem."
-    "How does the stock market work, and what factors influence stock prices?"
-    "What is quantum computing, and how is it different from classical computing?"
-    "Explain the theory of evolution and its significance in biology."
-    "What are the major types of renewable energy sources, and how do they work?"
-    "How does the immune system fight against diseases?"
-    "What is the Big Bang Theory, and what evidence supports it?"
-    "How do governments manage a country’s economy, and what are fiscal and monetary policies?"
-    "What are the main principles of democracy, and why is it important?"
-    "How do airplanes fly? Explain the principles of aerodynamics."
-    "What are the different layers of the Earth's atmosphere, and what are their characteristics?"
-    "How do volcanoes erupt, and what are the different types of volcanic eruptions?"
-    "What is the significance of the Industrial Revolution, and how did it change the world?"
-    "How does the human digestive system work, and what are its main organs?"
-    "What are the different types of economies (capitalism, socialism, communism), and how do they function?"
-    "Explain the process of DNA replication and why it is important for living organisms."
-    "What are the major causes and consequences of deforestation?"
-    "How does climate change affect biodiversity and ecosystems?"
-    "What is the significance of space exploration, and what are some major space missions in history?"
-    "How does the internet work, and what are the key technologies behind it?"
-    "What are the effects of globalization on economies and cultures?"
-    "What is cybersecurity, and why is it important in today’s digital world?"
-    "How do electric cars work, and what are their benefits compared to traditional cars?"
-    "What are the causes and impacts of ocean pollution?"
-    "How does the human heart function, and what are its key components?"
-    "What is nanotechnology, and what are its applications in medicine and engineering?"
-    "How do vaccines work, and why are they important for public health?"
-    "What are the differences between renewable and non-renewable resources?"
-    "How do earthquakes occur, and what are the different types of seismic waves?"
-    "What are genetic modifications, and how do they impact agriculture and medicine?"
-    "Explain the process of the water cycle and its importance in nature."
-    "What are some of the biggest technological advancements of the 21st century?"
-    "How do wireless communication technologies like 5G work?"
-    "What are the key differences between different world religions?"
-    "What are the main functions of the United Nations, and why was it formed?"
-    "What is cryptocurrency, and how does blockchain technology work?"
-    "How does artificial intelligence contribute to advancements in healthcare?"
-    "What are some of the most significant scientific discoveries of the last decade?"
-    "What is dark matter, and why is it important in astrophysics?"
-    "How do different types of governments (democracy, monarchy, dictatorship) operate?"
-    "What is the role of media in shaping public opinion and politics?"
-    "How do climate change agreements like the Paris Agreement help the environment?"
-    "What are the main principles of Einstein’s Theory of Relativity?"
-    "How do space telescopes like Hubble and James Webb help us explore the universe?"
-    "What is the history and significance of the Great Wall of China?"
-    "How does artificial intelligence impact the job market and employment trends?"
-    "What are the causes and effects of the Industrial and French Revolutions?"
-    "How do submarines work, and what are their uses in military and research?"
-    "What is the process of making and storing nuclear energy?"
-    "How does the process of genetic engineering work in medicine and agriculture?"
-    "What is the role of mitochondria in a cell, and why is it called the powerhouse?"
-    "How do climate patterns like El Niño and La Niña impact global weather?"
-    "What are the main challenges facing the world’s freshwater supply?"
-    "What is cybercrime, and what measures are taken to prevent it?"
-    "How does space travel affect the human body?"
-    "What are the key differences between socialism and communism?"
-    "How do forensic scientists solve crimes using DNA analysis?"
-    "What are the biggest challenges in developing a sustainable future?"
-    "How do black holes bend space and time, according to general relativity?"
-    "What are the major ethical concerns surrounding artificial intelligence?"
-    "How does deforestation contribute to climate change?"
-    "What are the effects of pollution on marine life?"
-    "How do wind turbines generate electricity?"
-    "What are the main goals of the European Union, and how does it function?"
-    "What is the importance of the ozone layer, and how can we protect it?"
-    "How do satellites help in weather forecasting?"
-    "What are the dangers of antibiotic resistance, and how can it be prevented?"
-    "How does the human body fight against infections and diseases?"
-    "What are the major theories about the origin of life on Earth?"
-    "How does artificial intelligence work in self-driving cars?"
-    "What is the role of big data in business and decision-making?"
-    "How do solar panels work, and what are their benefits?"
-    "What is the Fibonacci sequence, and where is it found in nature?"
-    "How do different cultures influence global cuisine and fashion trends?"
-    "What are the psychological effects of social media on human behavior?"
-    "How do electric generators convert mechanical energy into electrical energy?"
-    "What are the effects of war on a country’s economy and society?"
-    "How do historians study ancient civilizations and their cultures?"
-    "What is the process of desalination, and how can it solve water scarcity issues?"
-    "What are the main challenges of interstellar travel?"
-    "How do companies use artificial intelligence for customer service?"
-    "What are the ethical concerns related to genetic cloning?"
-    "How do environmental policies impact business and industries?"
-    "What is the role of women in history, and how has it evolved over time?"
-    )
-
-# Function to get a random general question
+# Function to get a random general question based on the API URL
 generate_random_general_question() {
+    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
+        general_questions=(
+            "Why is the Renaissance considered a turning point in history?"
+            "How did the Industrial Revolution change the world?"
+            "Why is the Great Wall of China historically significant?"
+        )
+    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+        general_questions=(
+            "What do you wear on your head when riding a bike?"
+            "Which is the smallest country in the world by land area?"
+            "What is the chemical symbol for gold?"
+            "Who was the first President of the United States?"
+        )
+    elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
+        general_questions=(
+            "What do you wear on your head when riding a bike?"
+            "Which is the smallest country in the world by land area?"
+        )
+    fi
+
     echo "${general_questions[$RANDOM % ${#general_questions[@]}]}"
 }
 
@@ -136,8 +107,10 @@ generate_random_general_question() {
 send_request() {
     local message="$1"
     local api_key="$2"
+    local key_name="$3"
 
-    echo "📬 Sending Question: $message"
+    echo "📬 Sending Question to $API_NAME using key: $key_name"
+    echo "📝 Question: $message"
 
     json_data=$(cat <<EOF
 {
@@ -165,37 +138,96 @@ EOF
         if [[ -z "$response_message" ]]; then
             echo "⚠️ Response content is empty!"
         else
-            ((success_count++))  # Increment success count
-            echo "✅ [SUCCESS] Response $success_count Received!"
-            echo "📝 Question: $message"
+            echo "✅ [SUCCESS] Response Received!"
             echo "💬 Response: $response_message"
         fi
     else
-        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying..."
-        sleep 2
+        echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
     fi
 }
 
-# Asking for API Key (loops until a valid key is provided)
-while true; do
+# Directory for API keys
+API_KEY_DIR="$HOME/gaianet"
+mkdir -p "$API_KEY_DIR"
+
+# Function to load existing API keys
+load_existing_keys() {
+    API_KEY_LIST=($(ls "$API_KEY_DIR" 2>/dev/null | grep '^apikey_'))
+    if [ ${#API_KEY_LIST[@]} -eq 0 ]; then
+        echo "❌ No existing API keys found."
+        return 1
+    else
+        echo "🔍 Detected existing API keys:"
+        for i in "${!API_KEY_LIST[@]}"; do
+            echo "$((i+1))) ${API_KEY_LIST[$i]}"
+        done
+        return 0
+    fi
+}
+
+# Function to add a new API key
+add_new_key() {
     echo -n "Enter your API Key: "
     read -r api_key
 
     if [ -z "$api_key" ]; then
         echo "❌ Error: API Key is required!"
-        echo "🔄 Restarting the installer..."
-
-        # Restart installer
-        rm -rf ~/gaiainstaller.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh 
-
-        exit 1
-    else
-        break  # Exit loop if API key is provided
+        return 1
     fi
+
+    while true; do
+        echo -n "Enter a name to save this key (no spaces): "
+        read -r key_name
+        key_name=$(echo "$key_name" | tr -d ' ')  # Remove spaces
+
+        if [ -z "$key_name" ]; then
+            echo "❌ Error: Name cannot be empty!"
+        elif [ -f "$API_KEY_DIR/apikey_$key_name" ]; then
+            echo "⚠️  A key with this name already exists! Choose a different name."
+        else
+            echo "$api_key" > "$API_KEY_DIR/apikey_$key_name"
+            chmod 600 "$API_KEY_DIR/apikey_$key_name"  # Secure the key file
+            echo "✅ API Key saved as 'apikey_$key_name'"
+            break
+        fi
+    done
+}
+
+# Main Menu
+while true; do
+    echo "📂 API Key Management"
+    echo "1) Load existing API keys"
+    echo "2) Add a new API key"
+    echo "3) Start sending requests"
+    echo "4) Exit"
+    echo -n "👉 Choose an option (1-4): "
+    read -r choice
+
+    case "$choice" in
+        1)
+            load_existing_keys
+            ;;
+        2)
+            add_new_key
+            ;;
+        3)
+            if [ ${#API_KEY_LIST[@]} -eq 0 ]; then
+                echo "❌ No API keys loaded. Please add or load keys first."
+            else
+                break  # Exit the menu and start sending requests
+            fi
+            ;;
+        4)
+            echo "🛑 Exiting..."
+            exit 0
+            ;;
+        *)
+            echo "❌ Invalid choice. Please try again."
+            ;;
+    esac
 done
 
-# Asking for duration
+# Ask for duration
 echo -n "⏳ How many hours do you want the bot to run? "
 read -r bot_hours
 
@@ -208,29 +240,28 @@ else
     exit 1
 fi
 
-# Hidden API URL (moved to the bottom)
-API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-
-# Display thread information
-echo "✅ Using 1 thread..."
-echo "⏳ Waiting 30 seconds before sending the first request..."
-sleep 5
-
-echo "🚀 Starting requests..."
+# Main Loop
 start_time=$(date +%s)
-success_count=0  # Initialize success counter
-
 while true; do
     current_time=$(date +%s)
     elapsed=$((current_time - start_time))
 
     if [[ "$elapsed" -ge "$max_duration" ]]; then
         echo "🛑 Time limit reached ($bot_hours hours). Exiting..."
-        echo "📊 Total successful responses: $success_count"
         exit 0
     fi
 
     random_message=$(generate_random_general_question)
-    send_request "$random_message" "$api_key"
-    sleep 0
+
+    # Send requests using all API keys in parallel
+    for key_file in "${API_KEY_LIST[@]}"; do
+        api_key=$(cat "$API_KEY_DIR/$key_file")
+        send_request "$random_message" "$api_key" "$key_file" &
+    done
+
+    # Wait for all background processes to finish
+    wait
+
+    # Sleep before the next batch of requests
+    sleep 5
 done
