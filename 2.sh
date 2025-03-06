@@ -467,87 +467,113 @@ check_if_vps_or_laptop() {
 # Main script logic
 echo "Detecting system configuration..."
 
-# Check if GaiaNet is installed
-if ! command -v ~/gaianet/bin/gaianet &> /dev/null; then
-    echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
-    echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-    read -r -p "Press Enter to return to the main menu..."
-    continue
-fi
+# Check if at least one GaiaNet node is installed and properly configured
+at_least_one_node_configured=0
 
-# Check if GaiaNet is installed properly
-gaianet_info=$( ~/gaianet/bin/gaianet info 2>/dev/null )
-if [[ -z "$gaianet_info" ]]; then
-    echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
-    echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
-    echo -e "\e[1;33m🔍 Run: \e[1;33m'go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-    read -r -p "Press Enter to return to the main menu..."
-    continue
-fi
+for ((i=1; i<=4; i++)); do
+    BASE_DIR="$HOME/gaianet$i"
+    PORT=$((8080 + i))
 
-# Proceed if GaiaNet is properly installed
-if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-    echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
+    # Check if the node directory exists
+    if [ -d "$BASE_DIR" ]; then
+        echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR...\e[0m"
 
-    # Check if at least one of the ports is active
-    at_least_one_port_active=0
-
-    echo -e "\e[1;34m🔍 Checking ports...\e[0m"
-    for ((i=1; i<=4; i++)); do
-        BASE_DIR="$HOME/gaianet$i"
-        PORT=$((8080 + i))
-        
-        # Check if the node directory exists
-        if [ -d "$BASE_DIR" ]; then
-            echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR on port $PORT...\e[0m"
-            if check_port $PORT; then
-                at_least_one_port_active=$((at_least_one_port_active + 1))
-                echo -e "\e[1;32m✅ Node $i is running on port $PORT.\e[0m"
-            else
-                echo -e "\e[1;31m❌ Node $i is not running on port $PORT.\e[0m"
-            fi
-        else
-            echo -e "\e[1;33m⚠️ Node $i directory ($BASE_DIR) does not exist.\e[0m"
+        # Check if the gaianet binary exists in the BASE_DIR
+        if ! command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
+            echo -e "\e[1;31m❌ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
+            continue
         fi
-    done
 
-    # If none of the ports are active, provide additional instructions
-    if [ $at_least_one_port_active -eq 0 ]; then
-        echo -e "\e[1;31m❌ No active ports found.\e[0m"
-        echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-        echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-        read -r -p "Press Enter to return to the main menu..."
-        continue
+        # Check if GaiaNet is properly configured
+        gaianet_info=$("$BASE_DIR/bin/gaianet" info 2>/dev/null)
+        if [[ -z "$gaianet_info" ]]; then
+            echo -e "\e[1;31m❌ GaiaNet in $BASE_DIR is installed but not configured properly.\e[0m"
+            echo -e "\e[1;33m🔍 Uninstall & Re-install Node $i.\e[0m"
+            continue
+        fi
+
+        # If Node ID or Device ID is found, the node is properly configured
+        if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+            echo -e "\e[1;32m✅ Node $i is properly configured.\e[0m"
+            at_least_one_node_configured=$((at_least_one_node_configured + 1))
+        else
+            echo -e "\e[1;31m❌ Node $i is not configured properly.\e[0m"
+        fi
+    else
+        echo -e "\e[1;33m⚠️ Node $i directory ($BASE_DIR) does not exist.\e[0m"
     fi
+done
 
-    echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
+# If no nodes are properly configured, exit
+if [ $at_least_one_node_configured -eq 0 ]; then
+    echo -e "\e[1;31m❌ No GaiaNet nodes are properly installed and configured.\e[0m"
+    echo -e "\e[1;33m🔍 Please install and configure at least one node.\e[0m"
+    read -r -p "Press Enter to return to the main menu..."
+    continue
+fi
 
-    # Determine the appropriate script based on system type
-    if check_if_vps_or_laptop; then
+# Proceed if at least one node is properly configured
+echo -e "\e[1;32m✅ At least one GaiaNet node is properly configured. Proceeding with chatbot setup.\e[0m"
+
+# Check if at least one of the ports is active
+at_least_one_port_active=0
+
+echo -e "\e[1;34m🔍 Checking ports...\e[0m"
+for ((i=1; i<=4; i++)); do
+    BASE_DIR="$HOME/gaianet$i"
+    PORT=$((8080 + i))
+
+    # Check if the node directory exists
+    if [ -d "$BASE_DIR" ]; then
+        echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR on port $PORT...\e[0m"
+        if check_port $PORT; then
+            at_least_one_port_active=$((at_least_one_port_active + 1))
+            echo -e "\e[1;32m✅ Node $i is running on port $PORT.\e[0m"
+        else
+            echo -e "\e[1;31m❌ Node $i is not running on port $PORT.\e[0m"
+        fi
+    else
+        echo -e "\e[1;33m⚠️ Node $i directory ($BASE_DIR) does not exist.\e[0m"
+    fi
+done
+
+# If none of the ports are active, provide additional instructions
+if [ $at_least_one_port_active -eq 0 ]; then
+    echo -e "\e[1;31m❌ No active ports found.\e[0m"
+    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
+    read -r -p "Press Enter to return to the main menu..."
+    continue
+fi
+
+echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
+
+# Determine the appropriate script based on system type
+if check_if_vps_or_laptop; then
+    script_name="gaiachat.sh"
+else
+    if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
+        echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
         script_name="gaiachat.sh"
     else
-        if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-            echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-            script_name="gaiachat.sh"
-        else
-            echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-            script_name="gaiachat.sh"
-        fi
+        echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+        script_name="gaiachat.sh"
     fi
+fi
 
-    # Start the chatbot in a detached screen session
-    screen -dmS gaiabot bash -c '
-    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
-    if [ -f "'"$script_name"'" ]; then
-        ./'"$script_name"' > gaiabot.log 2>&1
-    else
-        echo "❌ Error: Failed to download '"$script_name"'"
-        sleep 10
-        exit 1
-    fi'
+# Start the chatbot in a detached screen session
+screen -dmS gaiabot bash -c '
+curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+if [ -f "'"$script_name"'" ]; then
+    ./'"$script_name"' > gaiabot.log 2>&1
+else
+    echo "❌ Error: Failed to download '"$script_name"'"
+    sleep 10
+    exit 1
+fi'
 
-    sleep 5
-    screen -r gaiabot
+sleep 5
+screen -r gaiabot
 fi
             ;;
         5)
