@@ -558,14 +558,13 @@ echo "🔍 Starting chatbot script..."
 curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
 if [ -f "'"$script_name"'" ]; then
     echo "🔍 Executing chatbot script..."
-    ./'"$script_name"' > gaiabot.log 2>&1
+    ./'"$script_name"'
     echo "🔍 Chatbot script execution complete."
 else
     echo "❌ Error: Failed to download '"$script_name"'"
     sleep 10
     exit 1
 fi'
-
 sleep 5
 screen -r gaiabot
 ;;
