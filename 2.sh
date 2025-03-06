@@ -283,8 +283,15 @@ install_gaianet() {
 install_gaianet_node() {
     local NODE_NUMBER=$1
     local CONFIG_URL=$2
-    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local PORT=$((8080 + NODE_NUMBER))
+
+    # Set the base directory and port based on the node number
+    if [[ "$NODE_NUMBER" -eq 0 ]]; then
+        BASE_DIR="$HOME/gaianet"  # Default directory for node 0
+        PORT=8080
+    else
+        BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
+        PORT=$((8080 + NODE_NUMBER))
+    fi
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
@@ -457,36 +464,36 @@ while true; do
     read -rp "Enter your choice: " choice
 
     case $choice in
-        1|2|3)
-            echo "How many nodes do you want to install? (0-4)"
-            read -rp "Enter the number of nodes: " NODE_COUNT
-            if [[ ! "$NODE_COUNT" =~ ^[0-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
-            else
-                # Check for NVIDIA GPU and install CUDA if available
-                if check_nvidia_gpu; then
-                    if ! setup_cuda_env; then
-                        check_cuda_installed
-                        install_cuda
-                    else
-                        echo "⚠️ CUDA is already installed. Skipping CUDA installation."
-                    fi
+    1|2|3)
+        echo "How many nodes do you want to install? (0-4)"
+        read -rp "Enter the number of nodes: " NODE_COUNT
+        if [[ ! "$NODE_COUNT" =~ ^[0-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 0 and 4."
+        else
+            # Check for NVIDIA GPU and install CUDA if available
+            if check_nvidia_gpu; then
+                if ! setup_cuda_env; then
+                    check_cuda_installed
+                    install_cuda
                 else
-                    echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
+                    echo "⚠️ CUDA is already installed. Skipping CUDA installation."
                 fi
-
-                # Determine the configuration URL based on system type and GPU availability
-                set_config_url
-
-                # Install GaiaNet nodes
-                for ((i=0; i<NODE_COUNT; i++)); do
-                    install_gaianet_node "$i" "$CONFIG_URL"
-                done
-
-                # Return to the main menu
-                read -rp "Press Enter to return to the main menu..."
+            else
+                echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
             fi
-            ;;
+
+            # Determine the configuration URL based on system type and GPU availability
+            set_config_url
+
+            # Install GaiaNet nodes
+            for ((i=0; i<NODE_COUNT; i++)); do
+                install_gaianet_node "$i" "$CONFIG_URL"
+            done
+
+            # Return to the main menu
+            read -rp "Press Enter to return to the main menu..."
+        fi
+        ;;
 
         4)
             # Terminate any existing 'gaiabot' screen sessions before starting a new one
