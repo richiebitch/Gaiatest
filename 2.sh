@@ -31,7 +31,19 @@ RESET="\033[0m"
 
 #!/bin/bash
 
-# Check if sudo is installed
+# Function to install packages if not already installed
+install_pkg() {
+    local pkg=$1
+    if ! command -v $pkg &> /dev/null; then
+        echo "❌ $pkg is not installed. Installing $pkg..."
+        sudo apt update
+        sudo apt install -y $pkg
+    else
+        echo "✅ $pkg is already installed."
+    fi
+}
+
+# Install sudo if not present
 if ! command -v sudo &> /dev/null; then
     echo "❌ sudo is not installed. Installing sudo..."
     apt update
@@ -40,32 +52,44 @@ else
     echo "✅ sudo is already installed."
 fi
 
-# Check if screen is installed
-if ! command -v screen &> /dev/null; then
-    echo "❌ screen is not installed. Installing screen..."
-    sudo apt update
-    sudo apt install -y screen
-else
-    echo "✅ screen is already installed."
+# List of essential packages to install
+pkgs=(
+    "screen" "net-tools" "lsof" "wget" "htop" "nvtop"
+    "build-essential" "curl" "git" "ufw" "software-properties-common"
+    "apt-transport-https" "ca-certificates" "gnupg" "unzip" "zip"
+    "rsync" "vim" "tmux" "fail2ban" "logrotate" "chrony"
+    "iproute2" "dnsutils" "traceroute" "openssh-server"
+    "iotop" "sysstat" "glances" "python3" "python3-pip"
+    "python3-venv" "nodejs" "npm" "docker" "docker-compose"
+    "gparted" "ntfs-3g" "exfat-utils" "smartmontools"
+    "locate" "tree" "neofetch" "clamav" "rkhunter" "lynis"
+)
+
+# Install each package
+for pkg in "${pkgs[@]}"; do
+    install_pkg $pkg
+done
+
+# Update locate database
+if command -v updatedb &> /dev/null; then
+    echo "🔄 Updating locate database..."
+    sudo updatedb
 fi
 
-# Check if net-tools is installed
-if ! command -v ifconfig &> /dev/null; then
-    echo "❌ net-tools is not installed. Installing net-tools..."
-    sudo apt install -y net-tools
-else
-    echo "✅ net-tools is already installed."
-fi
+# Check for upgradable packages
+echo "🔍 Checking for upgradable packages..."
+upgradable=$(apt list --upgradable 2>/dev/null | grep -v "Listing...")
 
-# Check if lsof is installed
-if ! command -v lsof &> /dev/null; then
-    echo "❌ lsof is not installed. Installing lsof..."
-    sudo apt update
-    sudo apt install -y lsof
+if [[ -n "$upgradable" ]]; then
+    echo "📦 The following packages can be upgraded:"
+    echo "$upgradable"
+    echo "🚀 Upgrading packages..."
     sudo apt upgrade -y
 else
-    echo "✅ lsof is already installed."
+    echo "✅ No packages to upgrade."
 fi
+
+echo "🎉 System setup and updates are complete!"
 
 # Detect if running inside WSL
 IS_WSL=false
