@@ -291,7 +291,7 @@ install_gaianet_node() {
 
     # Set the base directory and port based on the node number
     BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
-    PORT=$((8081 + NODE_NUMBER))
+    PORT=$((8080 + NODE_NUMBER))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
@@ -562,7 +562,7 @@ case $choice in
             echo -e "\e[1;34m🔍 Checking ports...\e[0m"
             for ((i=1; i<=4; i++)); do
                 BASE_DIR="$HOME/gaianet$i"
-                PORT=$((8081 + i))
+                PORT=$((8080 + i))
 
                 # Check if the gaianet binary exists in the BASE_DIR
                 if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
