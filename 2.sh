@@ -254,15 +254,25 @@ install_gaianet_node() {
         fi
     fi
 
+
+    # Download and apply the configuration file
+    echo "📥 Downloading configuration from $CONFIG_URL..."
+    wget -O "$BASE_DIR/config.json" "$CONFIG_URL" || { echo "❌ Failed to download configuration file."; return 1; }
+
     # Configure port
     "$BASE_DIR/bin/gaianet" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; return 1; }
 
-    # Initialize and start the node
+    # Initialize the node
+    echo "⚙️ Initializing GaiaNet..."
     "$BASE_DIR/bin/gaianet" init --base "$BASE_DIR" || { echo "❌ GaiaNet initialization failed!"; return 1; }
+
+    # Start the node
+    echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
     "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
 
     echo "🎉 GaiaNet Node $NODE_NUMBER successfully installed and started in $BASE_DIR on port $PORT!"
 }
+
 # Function to start a specific node
 start_gaianet_node() {
     local NODE_NUMBER=$1
@@ -416,10 +426,7 @@ set_config_url
 # Install GaiaNet nodes
 for ((i=1; i<=NODE_COUNT; i++)); do
     install_gaianet_node "$i" "$CONFIG_URL"
-    set_config_url
 done
-# Determine the configuration URL based on system type and GPU availability
-set_config_url
             fi
             ;;
 
