@@ -574,7 +574,6 @@ fi'
 
 sleep 5
 screen -r gaiabot
-fi
             ;;
         5)
             # Switch to Active Screens
