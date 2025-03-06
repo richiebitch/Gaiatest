@@ -538,16 +538,16 @@ check_if_vps_or_laptop
 SYSTEM_TYPE=$?
 
 if [[ $SYSTEM_TYPE -eq 0 ]]; then
-    script_name="gaiachat.sh"
+    script_name="gac.sh"
 elif [[ $SYSTEM_TYPE -eq 1 ]]; then
-    script_name="gaiachat.sh"
+    script_name="gac.sh"
 else
     if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
         echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-        script_name="gaiachat.sh"
+        script_name="gac.sh"
     else
         echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-        script_name="gaiachat.sh"
+        script_name="gac.sh"
     fi
 fi
 
