@@ -269,6 +269,7 @@ EOF
         fi
     else
         echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
+        sleep 5
     fi
 }
 
@@ -389,5 +390,5 @@ while true; do
     wait
 
     # Sleep before the next batch of requests
-    sleep 5
+    sleep 1
 done
