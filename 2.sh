@@ -574,7 +574,6 @@ fi'
 
 sleep 5
 screen -r gaiabot
-            ;;
         5)
             # Switch to Active Screens
             echo "Switching to Active Screens..."
