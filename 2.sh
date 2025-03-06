@@ -280,7 +280,7 @@ start_gaianet_node() {
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
-        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
@@ -307,7 +307,7 @@ restart_gaianet_node() {
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
         "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
-        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
