@@ -454,9 +454,10 @@ check_port() {
 
 # Function to check if the system is a VPS, laptop, or desktop
 check_if_vps_or_laptop() {
-    vps_type=$(systemd-detect-virt)
-    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+    # Check for virtualization (VPS)
+    if grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/cpuinfo || grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/meminfo; then
         echo "✅ This is a VPS."
+    # Check for battery (Laptop)
     elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
         echo "✅ This is a Laptop."
     else
