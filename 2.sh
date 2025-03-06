@@ -52,8 +52,7 @@ fi
 
 # List of essential packages to install
 pkgs=(
-    "screen" "net-tools" "lsof" "wget" "htop" "nvtop"
-    "build-essential" "curl" "git"
+    "screen" "lsof" "wget" "htop" "nvtop" "curl" "git" "sudo"
 )
 
 # Install each package
