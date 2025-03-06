@@ -310,12 +310,6 @@ restart_gaianet_node() {
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
         
-        # Stop the existing node
-        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { 
-            echo "❌ Error: Failed to stop GaiaNet node!"; 
-            return 1; 
-        }
-        
         # Start the node with nohup
         nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" > "$LOG_FILE" 2>&1 < /dev/null & 
         
