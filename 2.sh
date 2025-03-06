@@ -361,15 +361,19 @@ stop_gaianet_node() {
 restart_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local LOG_FILE="$BASE_DIR/gaianet.log"
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
-        
-        # Start the node with nohup
-        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" > "$LOG_FILE" 2>&1 < /dev/null & 
-        
-        echo "✅ GaiaNet Node $NODE_NUMBER restarted. Logs: $LOG_FILE"
+
+        # Stop the node if it's running
+        echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
+        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+
+        # Start the node
+        echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
+        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+
+        echo "✅ GaiaNet Node $NODE_NUMBER restarted."
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
@@ -639,14 +643,15 @@ case $choice in
             ;;
 
         7)
-            echo "Which node do you want to restart? (1-4)"
-            read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
-            else
-                restart_gaianet_node "$NODE_NUMBER"
-            fi
-            ;;
+        echo "Which node do you want to restart? (1-4)"
+        read -rp "Enter the node number: " NODE_NUMBER
+        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 1 and 4."
+        else
+            restart_gaianet_node "$NODE_NUMBER"
+        fi
+        read -rp "Press Enter to return to the main menu..."
+        ;;
 
         8)
             echo "Which node do you want to stop? (1-4)"
