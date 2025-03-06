@@ -216,13 +216,13 @@ install_gaianet() {
         
         if [[ "$CUDA_VERSION" == "11"* || "$CUDA_VERSION" == "12"* ]]; then
             echo "🔧 Installing GaiaNet with CUDA support..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.21/install.sh' | bash -s -- --base "$BASE_DIR" --ggmlcuda "$CUDA_VERSION" || { echo "❌ GaiaNet installation failed."; exit 1; }
+            curl -sSfL 'https://raw.githubusercontent.com/abhiag/Gaiatest/main/install21.sh' | bash -s -- --base "$BASE_DIR" --ggmlcuda "$CUDA_VERSION" || { echo "❌ GaiaNet installation failed."; exit 1; }
             return
         fi
     fi
 
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.21/install.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
+    curl -sSfL 'https://raw.githubusercontent.com/abhiag/Gaiatest/main/install21.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
 
     # Download and apply the configuration file
     echo "📥 Downloading configuration from $CONFIG_URL..."
