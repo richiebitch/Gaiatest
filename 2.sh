@@ -560,9 +560,9 @@ case $choice in
             at_least_one_port_active=0
 
             echo -e "\e[1;34m🔍 Checking ports...\e[0m"
-            for ((i=0; i<=4; i++)); do
+            for ((i=1; i<=4; i++)); do
                 BASE_DIR="$HOME/gaianet$i"
-                PORT=$((8080 + i))
+                PORT=$((8081 + i))
 
                 # Check if the gaianet binary exists in the BASE_DIR
                 if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
@@ -639,9 +639,9 @@ case $choice in
             ;;
 
         7)
-            echo "Which node do you want to restart? (0-4)"
+            echo "Which node do you want to restart? (1-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 restart_gaianet_node "$NODE_NUMBER"
@@ -649,9 +649,9 @@ case $choice in
             ;;
 
         8)
-            echo "Which node do you want to stop? (0-4)"
+            echo "Which node do you want to stop? (1-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 stop_gaianet_node "$NODE_NUMBER"
@@ -659,9 +659,9 @@ case $choice in
             ;;
 
         9)
-            echo "Which node do you want to check? (0-4)"
+            echo "Which node do you want to check? (1-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 display_node_info "$NODE_NUMBER"
@@ -669,10 +669,10 @@ case $choice in
             ;;
 
         10)
-            echo "Which node do you want to uninstall? (0-4)"
+            echo "Which node do you want to uninstall? (1-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
+            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 1 and 4."
             else
                 echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER from your system!"
                 read -rp "Are you sure you want to proceed? (y/n) " confirm
