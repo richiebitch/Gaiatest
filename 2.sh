@@ -29,8 +29,6 @@ printf "\n\n"
 GREEN="\033[0;32m"
 RESET="\033[0m"
 
-#!/bin/bash
-
 # Function to install packages if not already installed
 install_pkg() {
     local pkg=$1
@@ -286,7 +284,7 @@ install_gaianet_node() {
     local NODE_NUMBER=$1
     local CONFIG_URL=$2
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local PORT=$((8081 + NODE_NUMBER - 1))
+    local PORT=$((8080 + NODE_NUMBER))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
@@ -305,7 +303,6 @@ install_gaianet_node() {
             return 1
         fi
     fi
-
 
     # Download and apply the configuration file
     echo "📥 Downloading configuration from $CONFIG_URL..."
@@ -433,9 +430,8 @@ while true; do
     echo "==============================================================="
     
     # Performance & Requirement Section
-    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
+    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 20 Hours Each Day! ⏳\e[0m"
     echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
-    echo -e "\e[1;94m☁️  VPS Requirements: 8 Core+ CPU & 6-8GB RAM (Higher is Better) ⚡\e[0m"
     echo -e "\e[1;92m💻  Supported GPUs: RTX 20/30/40/50 Series Or Higher 🟢\e[0m"
     echo "==============================================================="
     echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
@@ -461,10 +457,10 @@ while true; do
 
     case $choice in
         1|2|3)
-            echo "How many nodes do you want to install? (1-4)"
+            echo "How many nodes do you want to install? (0-4)"
             read -rp "Enter the number of nodes: " NODE_COUNT
-            if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_COUNT" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 # Check for NVIDIA GPU and install CUDA if available
                 if check_nvidia_gpu; then
@@ -478,148 +474,149 @@ while true; do
                     echo "⚠️ Skipping CUDA installation (no NVIDIA GPU detected)."
                 fi
 
-# Determine the configuration URL based on system type and GPU availability
-set_config_url
+                # Determine the configuration URL based on system type and GPU availability
+                set_config_url
 
-# Install GaiaNet nodes
-for ((i=1; i<=NODE_COUNT; i++)); do
-    install_gaianet_node "$i" "$CONFIG_URL"
-done
+                # Install GaiaNet nodes
+                for ((i=0; i<NODE_COUNT; i++)); do
+                    install_gaianet_node "$i" "$CONFIG_URL"
+                done
             fi
             ;;
 
         4)
-# Terminate any existing 'gaiabot' screen sessions before starting a new one
-echo "🔴 Terminating any existing 'gaiabot' screen sessions..."
-screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
+            # Terminate any existing 'gaiabot' screen sessions before starting a new one
+            echo "🔴 Terminating any existing 'gaiabot' screen sessions..."
+            screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
 
-# Function to check if a port is active
-check_port() {
-    local port=$1
-    if sudo lsof -i :$port > /dev/null 2>&1; then
-        echo -e "\e[1;32m✅ Port $port is active. GaiaNet node is running.\e[0m"
-        return 0
-    else
-        return 1
-    fi
-}
+            # Function to check if a port is active
+            check_port() {
+                local port=$1
+                if sudo lsof -i :$port > /dev/null 2>&1; then
+                    echo -e "\e[1;32m✅ Port $port is active. GaiaNet node is running.\e[0m"
+                    return 0
+                else
+                    return 1
+                fi
+            }
 
-# Function to check if the system is a VPS, laptop, or desktop
-check_if_vps_or_laptop() {
-    echo "🔍 Detecting system type..."
-    
-    # Check for virtualization (VPS)
-    if grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/cpuinfo || grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/meminfo; then
-        echo "✅ This is a VPS."
-        return 0
-    # Check for battery (Laptop)
-    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-        echo "✅ This is a Laptop."
-        return 1
-    else
-        echo "✅ This is a Desktop."
-        return 2
-    fi
-}
+            # Function to check if the system is a VPS, laptop, or desktop
+            check_if_vps_or_laptop() {
+                echo "🔍 Detecting system type..."
+                
+                # Check for virtualization (VPS)
+                if grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/cpuinfo || grep -qiE "kvm|qemu|vmware|xen|lxc" /proc/meminfo; then
+                    echo "✅ This is a VPS."
+                    return 0
+                # Check for battery (Laptop)
+                elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+                    echo "✅ This is a Laptop."
+                    return 1
+                else
+                    echo "✅ This is a Desktop."
+                    return 2
+                fi
+            }
 
-# Main script logic
-echo "Detecting system configuration..."
+            # Main script logic
+            echo "Detecting system configuration..."
 
-# Check if at least one GaiaNet node is installed
-at_least_one_node_installed=0
+            # Check if at least one GaiaNet node is installed
+            at_least_one_node_installed=0
 
-for ((i=1; i<=4; i++)); do
-    BASE_DIR="$HOME/gaianet$i"
+            for ((i=0; i<=4; i++)); do
+                BASE_DIR="$HOME/gaianet$i"
 
-    # Check if the gaianet binary exists in the BASE_DIR
-    if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
-        echo -e "\e[1;32m✅ GaiaNet binary found in $BASE_DIR/bin.\e[0m"
-        at_least_one_node_installed=$((at_least_one_node_installed + 1))
-    else
-        echo -e "\e[1;31m❌ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
-    fi
-done
+                # Check if the gaianet binary exists in the BASE_DIR
+                if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
+                    echo -e "\e[1;32m✅ GaiaNet binary found in $BASE_DIR/bin.\e[0m"
+                    at_least_one_node_installed=$((at_least_one_node_installed + 1))
+                else
+                    echo -e "\e[1;31m❌ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
+                fi
+            done
 
-# If no nodes are installed, exit
-if [ $at_least_one_node_installed -eq 0 ]; then
-    echo -e "\e[1;31m❌ No GaiaNet nodes are installed.\e[0m"
-    echo -e "\e[1;33m🔍 Please install at least one node.\e[0m"
-    read -r -p "Press Enter to return to the main menu..."
-    continue
-fi
+            # If no nodes are installed, exit
+            if [ $at_least_one_node_installed -eq 0 ]; then
+                echo -e "\e[1;31m❌ No GaiaNet nodes are installed.\e[0m"
+                echo -e "\e[1;33m🔍 Please install at least one node.\e[0m"
+                read -r -p "Press Enter to return to the main menu..."
+                continue
+            fi
 
-# Proceed if at least one node is installed
-echo -e "\e[1;32m✅ At least one GaiaNet node is installed. Proceeding with chatbot setup.\e[0m"
+            # Proceed if at least one node is installed
+            echo -e "\e[1;32m✅ At least one GaiaNet node is installed. Proceeding with chatbot setup.\e[0m"
 
-# Check if at least one of the ports is active
-at_least_one_port_active=0
+            # Check if at least one of the ports is active
+            at_least_one_port_active=0
 
-echo -e "\e[1;34m🔍 Checking ports...\e[0m"
-for ((i=1; i<=4; i++)); do
-    BASE_DIR="$HOME/gaianet$i"
-    PORT=$((8080 + i))
+            echo -e "\e[1;34m🔍 Checking ports...\e[0m"
+            for ((i=0; i<=4; i++)); do
+                BASE_DIR="$HOME/gaianet$i"
+                PORT=$((8080 + i))
 
-    # Check if the gaianet binary exists in the BASE_DIR
-    if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
-        echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR on port $PORT...\e[0m"
-        if check_port $PORT; then
-            at_least_one_port_active=$((at_least_one_port_active + 1))
-            echo -e "\e[1;32m✅ Node $i is running on port $PORT.\e[0m"
-        else
-            echo -e "\e[1;31m❌ Node $i is not running on port $PORT.\e[0m"
-        fi
-    else
-        echo -e "\e[1;33m⚠️ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
-    fi
-done
+                # Check if the gaianet binary exists in the BASE_DIR
+                if command -v "$BASE_DIR/bin/gaianet" &> /dev/null; then
+                    echo -e "\e[1;34m🔍 Checking Node $i in $BASE_DIR on port $PORT...\e[0m"
+                    if check_port $PORT; then
+                        at_least_one_port_active=$((at_least_one_port_active + 1))
+                        echo -e "\e[1;32m✅ Node $i is running on port $PORT.\e[0m"
+                    else
+                        echo -e "\e[1;31m❌ Node $i is not running on port $PORT.\e[0m"
+                    fi
+                else
+                    echo -e "\e[1;33m⚠️ GaiaNet binary not found in $BASE_DIR/bin.\e[0m"
+                fi
+            done
 
-# If none of the ports are active, provide additional instructions
-if [ $at_least_one_port_active -eq 0 ]; then
-    echo -e "\e[1;31m❌ No active ports found.\e[0m"
-    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-    read -r -p "Press Enter to return to the main menu..."
-    continue
-fi
+            # If none of the ports are active, provide additional instructions
+            if [ $at_least_one_port_active -eq 0 ]; then
+                echo -e "\e[1;31m❌ No active ports found.\e[0m"
+                echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+                echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
+                read -r -p "Press Enter to return to the main menu..."
+                continue
+            fi
 
-echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
+            echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
 
-# Determine the appropriate script based on system type
-echo "🔍 Determining system type..."
-check_if_vps_or_laptop
-SYSTEM_TYPE=$?
+            # Determine the appropriate script based on system type
+            echo "🔍 Determining system type..."
+            check_if_vps_or_laptop
+            SYSTEM_TYPE=$?
 
-if [[ $SYSTEM_TYPE -eq 0 ]]; then
-    script_name="gac.sh"
-elif [[ $SYSTEM_TYPE -eq 1 ]]; then
-    script_name="gac.sh"
-else
-    if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-        echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-        script_name="gac.sh"
-    else
-        echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-        script_name="gac.sh"
-    fi
-fi
+            if [[ $SYSTEM_TYPE -eq 0 ]]; then
+                script_name="gac.sh"
+            elif [[ $SYSTEM_TYPE -eq 1 ]]; then
+                script_name="gac.sh"
+            else
+                if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
+                    echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+                    script_name="gac.sh"
+                else
+                    echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+                    script_name="gac.sh"
+                fi
+            fi
 
-# Start the chatbot in a detached screen session
-echo "🚀 Starting chatbot in a detached screen session..."
-screen -dmS gaiabot bash -c '
-echo "🔍 Starting chatbot script..."
-curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
-if [ -f "'"$script_name"'" ]; then
-    echo "🔍 Executing chatbot script..."
-    ./'"$script_name"'
-    echo "🔍 Chatbot script execution complete."
-else
-    echo "❌ Error: Failed to download '"$script_name"'"
-    sleep 10
-    exit 1
-fi'
-sleep 5
-screen -r gaiabot
-;;
+            # Start the chatbot in a detached screen session
+            echo "🚀 Starting chatbot in a detached screen session..."
+            screen -dmS gaiabot bash -c '
+            echo "🔍 Starting chatbot script..."
+            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+            if [ -f "'"$script_name"'" ]; then
+                echo "🔍 Executing chatbot script..."
+                ./'"$script_name"'
+                echo "🔍 Chatbot script execution complete."
+            else
+                echo "❌ Error: Failed to download '"$script_name"'"
+                sleep 10
+                exit 1
+            fi'
+            sleep 5
+            screen -r gaiabot
+            ;;
+
         5)
             # Switch to Active Screens
             echo "Check Chat-Bot Active or Not..."
@@ -633,57 +630,57 @@ screen -r gaiabot
             ;;
 
         7)
-            echo "Which node do you want to restart? (1-4)"
+            echo "Which node do you want to restart? (0-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 restart_gaianet_node "$NODE_NUMBER"
             fi
             ;;
 
         8)
-            echo "Which node do you want to stop? (1-4)"
+            echo "Which node do you want to stop? (0-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 stop_gaianet_node "$NODE_NUMBER"
             fi
             ;;
 
         9)
-            echo "Which node do you want to check? (1-4)"
+            echo "Which node do you want to check? (0-4)"
             read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 display_node_info "$NODE_NUMBER"
             fi
             ;;
 
- 10)
-    echo "Which node do you want to uninstall? (1-4)"
-    read -rp "Enter the node number: " NODE_NUMBER
-    if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-        echo "❌ Invalid input. Please enter a number between 1 and 4."
-    else
-        echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER from your system!"
-        read -rp "Are you sure you want to proceed? (y/n) " confirm
-        if [[ "$confirm" == "y" ]]; then
-            echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER..."
-            BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-            if [ -d "$BASE_DIR" ]; then
-                rm -rf "$BASE_DIR"
-                echo "✅ GaiaNet Node $NODE_NUMBER has been uninstalled."
+        10)
+            echo "Which node do you want to uninstall? (0-4)"
+            read -rp "Enter the node number: " NODE_NUMBER
+            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
-                echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+                echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER from your system!"
+                read -rp "Are you sure you want to proceed? (y/n) " confirm
+                if [[ "$confirm" == "y" ]]; then
+                    echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER..."
+                    BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+                    if [ -d "$BASE_DIR" ]; then
+                        rm -rf "$BASE_DIR"
+                        echo "✅ GaiaNet Node $NODE_NUMBER has been uninstalled."
+                    else
+                        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+                    fi
+                else
+                    echo "Uninstallation aborted."
+                fi
             fi
-        else
-            echo "Uninstallation aborted."
-        fi
-    fi
-    ;;
+            ;;
 
         11)
             # Check installed nodes
