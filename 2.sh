@@ -394,9 +394,9 @@ while true; do
     echo -e "1) \e[1;46m\e[97m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
     echo -e "2) \e[1;45m\e[97m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
     echo -e "3) \e[1;44m\e[97m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
-    echo -e "4) \e[1;42m\e[97m🤖  Start Auto Chat With Ai-Agent\e[0m"
-    echo -e "5) \e[1;100m\e[97m🔍  Switch to Active Screens\e[0m"
-    echo -e "6) \e[1;41m\e[97m✋  Stop Auto Chatting With Ai-Agent\e[0m"
+    echo -e "4) \e[1;42m\e[97m🤖  Start Auto Chat With AI-Agent\e[0m"
+    echo -e "5) \e[1;100m\e[97m🔍 Check Chatting With AI-Agent Active or Not\e[0m"
+    echo -e "6) \e[1;41m\e[97m✋  Stop Auto Chatting With AI-Agent\e[0m"
     echo -e "7) \e[1;43m\e[97m🔄  Restart GaiaNet Node\e[0m"
     echo -e "8) \e[1;43m\e[97m⏹️  Stop GaiaNet Node\e[0m"
     echo -e "9) \e[1;46m\e[97m🔍  Check Your Gaia Node ID & Device ID\e[0m"
@@ -570,7 +570,7 @@ screen -r gaiabot
 ;;
         5)
             # Switch to Active Screens
-            echo "Switching to Active Screens..."
+            echo "Check Chat-Bot Active or Not..."
             # Add your logic here
             ;;
 
