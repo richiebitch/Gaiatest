@@ -284,14 +284,15 @@ install_gaianet_node() {
     local NODE_NUMBER=$1
     local CONFIG_URL=$2
 
-    # Set the base directory and port based on the node number
-    if [[ "$NODE_NUMBER" -eq 0 ]]; then
-        BASE_DIR="$HOME/gaianet"  # Default directory for node 0
-        PORT=8080
-    else
-        BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
-        PORT=$((8080 + NODE_NUMBER))
+    # Validate node number (must be between 1 and 4)
+    if [[ "$NODE_NUMBER" -lt 1 || "$NODE_NUMBER" -gt 4 ]]; then
+        echo "❌ Invalid node number. Please enter a number between 1 and 4."
+        return 1
     fi
+
+    # Set the base directory and port based on the node number
+    BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
+    PORT=$((8080 + NODE_NUMBER))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
@@ -463,12 +464,12 @@ while true; do
     
     read -rp "Enter your choice: " choice
 
-    case $choice in
+case $choice in
     1|2|3)
-        echo "How many nodes do you want to install? (0-4)"
-        read -rp "Enter the number of nodes: " NODE_COUNT
-        if [[ ! "$NODE_COUNT" =~ ^[0-4]$ ]]; then
-            echo "❌ Invalid input. Please enter a number between 0 and 4."
+        echo "Which node do you want to install? (1-4)"
+        read -rp "Enter the node number: " NODE_NUMBER
+        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 1 and 4."
         else
             # Check for NVIDIA GPU and install CUDA if available
             if check_nvidia_gpu; then
@@ -485,10 +486,8 @@ while true; do
             # Determine the configuration URL based on system type and GPU availability
             set_config_url
 
-            # Install GaiaNet nodes
-            for ((i=0; i<NODE_COUNT; i++)); do
-                install_gaianet_node "$i" "$CONFIG_URL"
-            done
+            # Install the specified node
+            install_gaianet_node "$NODE_NUMBER" "$CONFIG_URL"
 
             # Return to the main menu
             read -rp "Press Enter to return to the main menu..."
