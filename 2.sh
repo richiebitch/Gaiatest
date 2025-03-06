@@ -430,8 +430,9 @@ while true; do
     echo "==============================================================="
     
     # Performance & Requirement Section
-    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 20 Hours Each Day! ⏳\e[0m"
+    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
     echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
+    echo -e "\e[1;94m☁️  VPS Requirements: 8 Core+ CPU & 6-8GB RAM (Higher is Better) ⚡\e[0m"
     echo -e "\e[1;92m💻  Supported GPUs: RTX 20/30/40/50 Series Or Higher 🟢\e[0m"
     echo "==============================================================="
     echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
@@ -481,6 +482,9 @@ while true; do
                 for ((i=0; i<NODE_COUNT; i++)); do
                     install_gaianet_node "$i" "$CONFIG_URL"
                 done
+
+                # Return to the main menu
+                read -rp "Press Enter to return to the main menu..."
             fi
             ;;
 
