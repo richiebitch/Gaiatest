@@ -55,14 +55,7 @@ fi
 # List of essential packages to install
 pkgs=(
     "screen" "net-tools" "lsof" "wget" "htop" "nvtop"
-    "build-essential" "curl" "git" "ufw" "software-properties-common"
-    "apt-transport-https" "ca-certificates" "gnupg" "unzip" "zip"
-    "rsync" "vim" "tmux" "fail2ban" "logrotate" "chrony"
-    "iproute2" "dnsutils" "traceroute" "openssh-server"
-    "iotop" "sysstat" "glances" "python3" "python3-pip"
-    "python3-venv" "nodejs" "npm" "docker" "docker-compose"
-    "gparted" "ntfs-3g" "exfat-utils" "smartmontools"
-    "locate" "tree" "neofetch" "clamav" "rkhunter" "lynis"
+    "build-essential" "curl" "git"
 )
 
 # Install each package
@@ -99,6 +92,41 @@ if grep -qi microsoft /proc/version; then
 else
     echo "🖥️ Running on a native Ubuntu system."
 fi
+
+# Function to automatically detect and set the local timezone
+setup_timezone() {
+    log_message "Detecting and setting local timezone..."
+
+    # Install tzdata if not already installed
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get update > /dev/null 2>&1
+    sudo apt-get install -y tzdata > /dev/null 2>&1
+
+    # Detect the local timezone using timedatectl
+    if command -v timedatectl &> /dev/null; then
+        LOCAL_TIMEZONE=$(timedatectl show --property=Timezone --value)
+        if [ -z "$LOCAL_TIMEZONE" ]; then
+            log_message "Warning: Unable to detect local timezone. Falling back to UTC."
+            LOCAL_TIMEZONE="UTC"
+        fi
+    else
+        log_message "Warning: 'timedatectl' not found. Falling back to IP-based timezone detection."
+        # Fallback to IP-based timezone detection
+        LOCAL_TIMEZONE=$(curl -s https://ipapi.co/timezone)
+        if [ -z "$LOCAL_TIMEZONE" ]; then
+            log_message "Warning: IP-based timezone detection failed. Falling back to UTC."
+            LOCAL_TIMEZONE="UTC"
+        fi
+    fi
+
+    # Set the detected timezone
+    log_message "Setting timezone to $LOCAL_TIMEZONE..."
+    echo "$LOCAL_TIMEZONE" | sudo tee /etc/timezone > /dev/null
+    sudo ln -fs "/usr/share/zoneinfo/$LOCAL_TIMEZONE" /etc/localtime
+    sudo dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
+
+    log_message "Timezone successfully set to $(date)."
+}
 
 # Check if CUDA is already installed
 check_cuda_installed() {
