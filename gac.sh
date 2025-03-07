@@ -36,7 +36,7 @@ set_api_url() {
 
     if [ "$system_type" -eq 0 ]; then
         # VPS
-        API_URL="https://hyper.gaia.domains/v1/chat/completions"
+        API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
         API_NAME="Hyper"
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
@@ -44,7 +44,7 @@ set_api_url() {
             API_URL="https://soneium.gaia.domains/v1/chat/completions"
             API_NAME="Soneium"
         else
-            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
         fi
     elif [ "$system_type" -eq 2 ]; then
@@ -53,7 +53,7 @@ set_api_url() {
             API_URL="https://gadao.gaia.domains/v1/chat/completions"
             API_NAME="Gadao"
         else
-            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
         fi
     fi
