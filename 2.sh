@@ -360,8 +360,15 @@ stop_gaianet_node() {
 # Function to restart a specific node without logging
 restart_gaianet_node() {
     local NODE_NUMBER=$1
-    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local PORT=$((8080 + NODE_NUMBER))
+
+    # Set the base directory and port based on the node number
+    if [[ "$NODE_NUMBER" -eq 0 ]]; then
+        BASE_DIR="$HOME/gaianet"  # Default directory for node 0
+        PORT=8080
+    else
+        BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
+        PORT=$((8080 + NODE_NUMBER))
+    fi
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
@@ -525,7 +532,7 @@ while true; do
     echo -e "5) \e[1;100m\e[97m🔍 Check Chatting With AI-Agent Active or Not\e[0m"
     echo -e "6) \e[1;41m\e[97m✋  Stop Auto Chatting With AI-Agent\e[0m"
     echo -e "7) \e[1;43m\e[97m🔄  Restart GaiaNet Node\e[0m"
-    echo -e "8) \e[1;43m\e[97m⏹️  Stop GaiaNet Node\e[0m"
+    echo -e "8) \e[1;43m\e[97m⏹️  Stop All GaiaNet Nodes\e[0m"
     echo -e "9) \e[1;46m\e[97m🔍  Check Your Gaia Node ID & Device ID\e[0m"
     echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
     echo -e "11) \e[1;44m\e[97m📋  Check Installed & Active Nodes\e[0m"
@@ -715,10 +722,10 @@ case $choice in
             ;;
 
         7)
-        echo "Which node do you want to restart? (1-4)"
+        echo "Which node do you want to restart? (0-4)"
         read -rp "Enter the node number: " NODE_NUMBER
-        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-            echo "❌ Invalid input. Please enter a number between 1 and 4."
+        if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 0 and 4."
         else
             restart_gaianet_node "$NODE_NUMBER"
         fi
