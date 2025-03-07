@@ -336,37 +336,26 @@ start_gaianet_node() {
     fi
 }
 
-# Function to stop all node
+# Function to stop a specific node or all nodes
 stop_gaianet_node() {
     local NODE_NUMBER=$1
 
     if [[ "$NODE_NUMBER" == "all" ]]; then
-        # Stop all nodes individually
-        echo "🛑 Stopping all GaiaNet nodes..."
-        for NODE in {0..4}; do
-            local BASE_DIR="$HOME/gaianet$NODE"
-            local PORT=$((8080 + NODE))
+        # Stop all nodes and shared services
+        echo "🛑 Stopping all GaiaNet nodes and shared services..."
 
-            if [ -f "$BASE_DIR/bin/gaianet" ]; then
-                echo "🛑 Stopping GaiaNet Node $NODE..."
+        # Check if ~/gaianet/bin/gaianet exists
+        if [ -f "$HOME/gaianet/bin/gaianet" ]; then
+            "$HOME/gaianet/bin/gaianet" stop || { echo "❌ Error: Failed to stop all nodes!"; return 1; }
+        # Check if ~/gaianet0/bin/gaianet exists
+        elif [ -f "$BASE_DIR/bin/gaianet" ]; then
+            "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop all nodes!"; return 1; }
+        else
+            echo "❌ Gaianet node not found. Unable to stop all nodes."
+            return 1
+        fi
 
-                # Find and kill the process(es) listening on the node's port
-                PIDS=$(lsof -t -i :$PORT)
-                if [ -n "$PIDS" ]; then
-                    echo "🛑 Killing process(es) listening on port $PORT..."
-                    for PID in $PIDS; do
-                        echo "🛑 Killing process $PID..."
-                        kill -9 "$PID" || { echo "❌ Error: Failed to stop process $PID!"; return 1; }
-                    done
-                    echo "✅ GaiaNet Node $NODE stopped."
-                else
-                    echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
-                fi
-            else
-                echo "❌ GaiaNet Node $NODE is not installed."
-            fi
-        done
-        echo "✅ All GaiaNet nodes stopped."
+        echo "✅ All GaiaNet nodes and shared services stopped."
     else
         # Stop a specific node by killing the process(es) listening on its port
         local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
