@@ -422,6 +422,21 @@ restart_gaianet_node() {
     fi
 }
 
+#!/bin/bash
+
+# Function to check if a node is running by checking its port
+check_node_status() {
+    local NODE_NUMBER=$1
+    local PORT=$((8080 + NODE_NUMBER))  # Calculate the port based on the node number
+
+    # Check if the port is open and listening
+    if ss -lnt | grep -q ":$PORT "; then
+        echo "Status: Running (Port $PORT)"
+    else
+        echo "Status: Stopped (Port $PORT)"
+    fi
+}
+
 # Function to display node information (merged with check_all_installed_nodes)
 display_node_info() {
     local NODE_NUMBER=$1
@@ -434,7 +449,7 @@ display_node_info() {
         if [ -d "$HOME/gaianet" ]; then
             echo "---------------------------------------------------------------"
             echo "📂 Checking default node in directory: $HOME/gaianet"
-            display_node_info "default"
+            display_node_info "0"  # Default node is treated as node 0
         fi
 
         # Check additional nodes in ~/gaianet1, ~/gaianet2, etc.
@@ -450,8 +465,8 @@ display_node_info() {
         echo "✅ Done checking all installed nodes."
     else
         # If a node number is provided, check the specific node
-        if [[ "$NODE_NUMBER" == "default" ]]; then
-            local BASE_DIR="$HOME/gaianet"
+        if [[ "$NODE_NUMBER" == "0" ]]; then
+            local BASE_DIR="$HOME/gaianet"  # Default node directory
         else
             local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
         fi
@@ -459,6 +474,7 @@ display_node_info() {
         if [ -f "$BASE_DIR/bin/gaianet" ]; then
             echo "🔍 Information for GaiaNet Node $NODE_NUMBER:"
             "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch node information!"; return 1; }
+            check_node_status "$NODE_NUMBER"  # Check and display the node status
         else
             echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
         fi
