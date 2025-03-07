@@ -431,9 +431,9 @@ check_node_status() {
 
     # Check if the port is open and listening
     if ss -lnt | grep -q ":$PORT "; then
-        echo "Status: Running (Port $PORT)"
+        echo "Node Status: Running 🟢 (Port $PORT)"
     else
-        echo "Status: Stopped (Port $PORT)"
+        echo "Node Status: Stopped 🔴 (Port $PORT)"
     fi
 }
 
@@ -516,7 +516,7 @@ check_installed_nodes() {
             echo "Node $NODE_NUMBER:"
             echo "  Directory: $dir"
             echo "  Status: $STATUS"
-            echo "  Port Status: $PORT_STATUS"
+            echo "  Node Status: $PORT_STATUS"
             echo "----------------------------------------"
         fi
     done
