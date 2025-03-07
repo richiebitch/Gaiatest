@@ -543,9 +543,9 @@ while true; do
 
 case $choice in
     1|2|3)
-        echo "Which node do you want to install? (1-4)"
-        read -rp "Enter the node number: " NODE_NUMBER
-        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+        echo "How many nodes do you want to install? (1-4)"
+        read -rp "Enter the number of nodes: " NODE_COUNT
+        if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
             echo "❌ Invalid input. Please enter a number between 1 and 4."
         else
             # Check for NVIDIA GPU and install CUDA if available
@@ -563,8 +563,10 @@ case $choice in
             # Determine the configuration URL based on system type and GPU availability
             set_config_url
 
-            # Install the specified node
-            install_gaianet_node "$NODE_NUMBER" "$CONFIG_URL"
+            # Install the specified number of nodes
+            for ((i=1; i<=NODE_COUNT; i++)); do
+                install_gaianet_node "$i" "$CONFIG_URL"
+            done
 
             # Return to the main menu
             read -rp "Press Enter to return to the main menu..."
