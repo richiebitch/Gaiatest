@@ -798,33 +798,7 @@ case $choice in
     ;;
 
         9)
-            # Submenu for checking node information
-            echo -e "\n\e[1mSelect an option:\e[0m"
-            echo -e "1) Check a specific node (default, 1-4)"
-            echo -e "2) Check all installed nodes"
-            echo -e "0) Go back to main menu"
-            read -rp "Enter your choice: " SUB_CHOICE
-
-            case $SUB_CHOICE in
-                1)
-                    echo "Which node do you want to check? (Enter 'default' or a number between 1-4)"
-                    read -rp "Enter the node number: " NODE_NUMBER
-                    if [[ "$NODE_NUMBER" != "default" && ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                        echo "❌ Invalid input. Please enter 'default' or a number between 1 and 4."
-                    else
-                        display_node_info "$NODE_NUMBER"
-                    fi
-                    ;;
-                2)
-                    display_node_info  # Call without arguments to check all nodes
-                    ;;
-                0)
-                    echo "Returning to main menu..."
-                    ;;
-                *)
-                    echo "❌ Invalid option. Please try again."
-                    ;;
-            esac
+            display_node_info
             ;;
 
         11)
