@@ -468,7 +468,7 @@ while true; do
     echo -e "8) \e[1;43m\e[97m⏹️  Stop GaiaNet Node\e[0m"
     echo -e "9) \e[1;46m\e[97m🔍  Check Your Gaia Node ID & Device ID\e[0m"
     echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
-    echo -e "11) \e[1;44m\e[97m📋  List Installed Nodes\e[0m"
+    echo -e "11) \e[1;44m\e[97m📋  Check Installed & Active Nodes\e[0m"
     echo -e "0) \e[1;31m❌  Exit Installer\e[0m"
     echo "==============================================================="
     
