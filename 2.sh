@@ -282,16 +282,8 @@ install_gaianet() {
 install_gaianet_node() {
     local NODE_NUMBER=$1
     local CONFIG_URL=$2
-
-    # Validate node number (must be between 1 and 4)
-    if [[ "$NODE_NUMBER" -lt 1 || "$NODE_NUMBER" -gt 4 ]]; then
-        echo "❌ Invalid node number. Please enter a number between 1 and 4."
-        return 1
-    fi
-
-    # Set the base directory and port based on the node number
-    BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
-    PORT=$((8080 + NODE_NUMBER))
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+    local PORT=$((8080 + NODE_NUMBER))
 
     echo "🔧 Setting up GaiaNet Node $NODE_NUMBER in $BASE_DIR on port $PORT..."
 
