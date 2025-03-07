@@ -850,11 +850,11 @@ case $choice in
 
     11)
             # Option 11: Uninstall a node
-            echo "Which node do you want to uninstall? (1-4)"
+            echo "Which node do you want to uninstall? (0 for default, 1-4 for additional nodes)"
             read -rp "Enter the node number: " NODE_NUMBER
 
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 1 and 4."
+            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+                echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 PORT=$((8080 + NODE_NUMBER))
                 uninstall_node_by_port "$PORT"
