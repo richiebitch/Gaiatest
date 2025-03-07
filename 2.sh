@@ -344,20 +344,30 @@ start_gaianet_node() {
     fi
 }
 
-# Function to stop a specific node
+# Function to stop a specific node based on its active port number
 stop_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+    local PORT=$((8080 + NODE_NUMBER))
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+
+        # Find the process ID (PID) listening on the node's port
+        PID=$(lsof -t -i :$PORT)
+        if [ -n "$PID" ]; then
+            echo "🛑 Killing process $PID listening on port $PORT..."
+            kill -9 "$PID" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+            echo "✅ GaiaNet Node $NODE_NUMBER stopped."
+        else
+            echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
+        fi
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
 }
 
-# Function to restart a specific node without stopping shared services
+# Function to restart a specific node without logging
 restart_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
@@ -376,10 +386,10 @@ restart_gaianet_node() {
             echo "ℹ️ No process found listening on port $PORT."
         fi
 
-        # Start the node
+        # Start the node without logging
         echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
-        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
-
+        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" > /dev/null 2>&1 &
+        
         echo "✅ GaiaNet Node $NODE_NUMBER restarted."
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
@@ -437,6 +447,55 @@ check_installed_nodes() {
             echo "  Port Status: $PORT_STATUS"
             echo "----------------------------------------"
         fi
+    done
+}
+
+# Function to list active screen sessions and allow user to select one
+select_screen_session() {
+    while true; do
+        echo "🔍 Checking for active screen sessions..."
+
+        # Get the list of active screen sessions
+        sessions=$(screen -list | grep -oP '\d+\.\S+' | awk '{print $1}')
+
+        # Check if there are any active sessions
+        if [ -z "$sessions" ]; then
+            echo "❌ No active screen sessions found."
+            return  # Return to the main menu
+        fi
+
+        # Display the list of sessions with numbers
+        echo "✅ Active screen sessions:"
+        i=1
+        declare -A session_map
+        for session in $sessions; do
+            session_name=$(echo "$session" | cut -d'.' -f2)
+            echo "$i) $session_name"
+            session_map[$i]=$session
+            i=$((i+1))
+        done
+
+        # Prompt the user to select a session
+        echo -n "👉 Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
+        read -r choice
+
+        # If the user presses Enter, return to the main menu
+        if [ -z "$choice" ]; then
+            echo "Returning to the main menu..."
+            return
+        fi
+
+        # Validate the user's choice
+        if [[ -z "${session_map[$choice]}" ]]; then
+            echo "❌ Invalid selection. Please try again."
+            continue
+        fi
+
+        # Attach to the selected session
+        selected_session=${session_map[$choice]}
+        echo "🚀 Attaching to session: $selected_session"
+        screen -d -r "$selected_session"
+        break
     done
 }
 
@@ -645,15 +704,20 @@ case $choice in
             ;;
 
         5)
-            # Switch to Active Screens
-            echo "Check Chat-Bot Active or Not..."
-            # Add your logic here
-            ;;
+        echo "🔍 Check Chat-Bot Active or Not..."
+        select_screen_session
+        read -rp "Press Enter to return to the main menu..."
+        ;;
 
         6)
             # Stop Auto Chatting With Ai-Agent
             echo "Stopping Auto Chatting With Ai-Agent..."
-            # Add your logic here
+            echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
+            # Terminate all 'gaiabot' screen sessions
+            screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
+            # Remove any remaining screen sockets for 'gaiabot'
+            find /var/run/screen -type s -name "*gaiabot*" -exec sudo rm -rf {} + 2>/dev/null
+            echo -e "\e[32m✅ All 'gaiabot' screen sessions have been killed and wiped.\e[0m"
             ;;
 
         7)
@@ -668,14 +732,15 @@ case $choice in
         ;;
 
         8)
-            echo "Which node do you want to stop? (1-4)"
-            read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
-            else
-                stop_gaianet_node "$NODE_NUMBER"
-            fi
-            ;;
+        echo "Which node do you want to stop? (1-4)"
+        read -rp "Enter the node number: " NODE_NUMBER
+        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 1 and 4."
+        else
+            stop_gaianet_node "$NODE_NUMBER"
+        fi
+        read -rp "Press Enter to return to the main menu..."
+        ;;
 
         9)
             echo "Which node do you want to check? (1-4)"
