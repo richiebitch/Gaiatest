@@ -422,35 +422,47 @@ restart_gaianet_node() {
     fi
 }
 
-# Function to display node information
+# Function to display node information (merged with check_all_installed_nodes)
 display_node_info() {
     local NODE_NUMBER=$1
-    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
 
-    if [ -f "$BASE_DIR/bin/gaianet" ]; then
-        echo "🔍 Information for GaiaNet Node $NODE_NUMBER:"
-        "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch node information!"; return 1; }
-    else
-        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
-    fi
-}
+    if [[ -z "$NODE_NUMBER" ]]; then
+        # If no node number is provided, check all installed nodes
+        echo "🔍 Checking all installed GaiaNet nodes..."
 
-# Function to check all installed nodes
-check_all_installed_nodes() {
-    echo "🔍 Checking all installed GaiaNet nodes..."
-
-    # Check for nodes in ~/gaianet, ~/gaianet1, ~/gaianet2, etc.
-    for NODE_DIR in "$HOME/gaianet" "$HOME/gaianet"{1..10}; do
-        if [ -d "$NODE_DIR" ]; then
+        # Check the default node in ~/gaianet
+        if [ -d "$HOME/gaianet" ]; then
             echo "---------------------------------------------------------------"
-            echo "📂 Checking node in directory: $NODE_DIR"
-            NODE_NUMBER=$(basename "$NODE_DIR" | grep -o '[0-9]*')
-            NODE_NUMBER=${NODE_NUMBER:-0}  # Default to 0 if no number is found
-            display_node_info "$NODE_NUMBER"
+            echo "📂 Checking default node in directory: $HOME/gaianet"
+            display_node_info "default"
         fi
-    done
 
-    echo "✅ Done checking all installed nodes."
+        # Check additional nodes in ~/gaianet1, ~/gaianet2, etc.
+        for NODE_DIR in "$HOME/gaianet"{1..10}; do
+            if [ -d "$NODE_DIR" ]; then
+                echo "---------------------------------------------------------------"
+                echo "📂 Checking node in directory: $NODE_DIR"
+                NODE_NUMBER=$(basename "$NODE_DIR" | grep -o '[0-9]*')
+                display_node_info "$NODE_NUMBER"
+            fi
+        done
+
+        echo "✅ Done checking all installed nodes."
+    else
+        # If a node number is provided, check the specific node
+        if [[ "$NODE_NUMBER" == "default" ]]; then
+            local BASE_DIR="$HOME/gaianet"
+        else
+            local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+        fi
+
+        if [ -f "$BASE_DIR/bin/gaianet" ]; then
+            echo "🔍 Information for GaiaNet Node $NODE_NUMBER:"
+            "$BASE_DIR/bin/gaianet" info --base "$BASE_DIR" || { echo "❌ Error: Failed to fetch node information!"; return 1; }
+        else
+            echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+        fi
+    fi
 }
 
 # Function to check installed nodes and their port status
@@ -786,14 +798,34 @@ case $choice in
     ;;
 
         9)
-    echo "Which node do you want to check? (1-4)"
-    read -rp "Enter the node number: " NODE_NUMBER
-    if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-        echo "❌ Invalid input. Please enter a number between 1 and 4."
-    else
-        display_node_info "$NODE_NUMBER"
-    fi
-    ;;
+            # Submenu for checking node information
+            echo -e "\n\e[1mSelect an option:\e[0m"
+            echo -e "1) Check a specific node (default, 1-4)"
+            echo -e "2) Check all installed nodes"
+            echo -e "0) Go back to main menu"
+            read -rp "Enter your choice: " SUB_CHOICE
+
+            case $SUB_CHOICE in
+                1)
+                    echo "Which node do you want to check? (Enter 'default' or a number between 1-4)"
+                    read -rp "Enter the node number: " NODE_NUMBER
+                    if [[ "$NODE_NUMBER" != "default" && ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+                        echo "❌ Invalid input. Please enter 'default' or a number between 1 and 4."
+                    else
+                        display_node_info "$NODE_NUMBER"
+                    fi
+                    ;;
+                2)
+                    display_node_info  # Call without arguments to check all nodes
+                    ;;
+                0)
+                    echo "Returning to main menu..."
+                    ;;
+                *)
+                    echo "❌ Invalid option. Please try again."
+                    ;;
+            esac
+            ;;
 
         11)
             echo "Which node do you want to uninstall? (1-4)"
