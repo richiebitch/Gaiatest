@@ -435,6 +435,24 @@ display_node_info() {
     fi
 }
 
+# Function to check all installed nodes
+check_all_installed_nodes() {
+    echo "🔍 Checking all installed GaiaNet nodes..."
+
+    # Check for nodes in ~/gaianet, ~/gaianet1, ~/gaianet2, etc.
+    for NODE_DIR in "$HOME/gaianet" "$HOME/gaianet"{1..10}; do
+        if [ -d "$NODE_DIR" ]; then
+            echo "---------------------------------------------------------------"
+            echo "📂 Checking node in directory: $NODE_DIR"
+            NODE_NUMBER=$(basename "$NODE_DIR" | grep -o '[0-9]*')
+            NODE_NUMBER=${NODE_NUMBER:-0}  # Default to 0 if no number is found
+            display_node_info "$NODE_NUMBER"
+        fi
+    done
+
+    echo "✅ Done checking all installed nodes."
+}
+
 # Function to check installed nodes and their port status
 check_installed_nodes() {
     echo "🔍 Checking installed GaiaNet nodes and port status..."
@@ -768,14 +786,14 @@ case $choice in
     ;;
 
         9)
-            echo "Which node do you want to check? (1-4)"
-            read -rp "Enter the node number: " NODE_NUMBER
-            if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
-            else
-                display_node_info "$NODE_NUMBER"
-            fi
-            ;;
+    echo "Which node do you want to check? (1-4)"
+    read -rp "Enter the node number: " NODE_NUMBER
+    if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+        echo "❌ Invalid input. Please enter a number between 1 and 4."
+    else
+        display_node_info "$NODE_NUMBER"
+    fi
+    ;;
 
         11)
             echo "Which node do you want to uninstall? (1-4)"
