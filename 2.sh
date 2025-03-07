@@ -727,9 +727,9 @@ case $choice in
         ;;
 
         8)
-        echo "Which node do you want to stop? (1-4)"
+        echo "Which node do you want to stop? (0-4)"
         read -rp "Enter the node number: " NODE_NUMBER
-        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
+        if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
             echo "❌ Invalid input. Please enter a number between 1 and 4."
         else
             stop_gaianet_node "$NODE_NUMBER"
