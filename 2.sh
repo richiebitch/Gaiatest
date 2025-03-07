@@ -597,7 +597,7 @@ while true; do
 # Menu Options
 echo -e "\n\e[1mSelect an action:\e[0m\n"
 echo -e "1) \e[1m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
-echo -e "3) \e[1m🎮  Install Gaia-Node (NVIDIA GPU)\e[0m"
+echo -e "3) \e[1m🎮  Install Gaia-Node (NVIDIA GPU Desktop/Laptop/VSP)\e[0m"
 echo -e "4) \e[1m🤖  Start Auto Chat With AI-Agent\e[0m"
 echo -e "5) \e[1m🔍 Check Chatting With AI-Agent Active or Not\e[0m"
 echo -e "6) \e[1m✋  Stop Auto Chatting With AI-Agent\e[0m"
