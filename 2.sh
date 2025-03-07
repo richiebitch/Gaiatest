@@ -569,6 +569,30 @@ select_screen_session() {
     done
 }
 
+# Function to uninstall a node by port number
+uninstall_node_by_port() {
+    local PORT=$1
+    local NODE_NUMBER=$((PORT - 8080))
+    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+
+    echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER (Port: $PORT) from your system!"
+    read -rp "Are you sure you want to proceed? (y/n) " confirm
+    if [[ "$confirm" == "y" ]]; then
+        echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER (Port: $PORT)..."
+        if [ -d "$BASE_DIR" ]; then
+            rm -rf "$BASE_DIR"
+            echo "✅ GaiaNet Node $NODE_NUMBER (Port: $PORT) has been uninstalled."
+        else
+            echo "❌ GaiaNet Node $NODE_NUMBER (Port: $PORT) is not installed."
+        fi
+    else
+        echo "Uninstallation aborted."
+    fi
+}
+
+# Main script logic
+case "$1" in
+
 # Main menu
 while true; do
     clear
@@ -814,35 +838,12 @@ case $choice in
             display_node_info
             ;;
 
-# Function to uninstall a node by port number
-uninstall_node_by_port() {
-    local PORT=$1
-    local NODE_NUMBER=$((PORT - 8080))
-    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-
-    echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER (Port: $PORT) from your system!"
-    read -rp "Are you sure you want to proceed? (y/n) " confirm
-    if [[ "$confirm" == "y" ]]; then
-        echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER (Port: $PORT)..."
-        if [ -d "$BASE_DIR" ]; then
-            rm -rf "$BASE_DIR"
-            echo "✅ GaiaNet Node $NODE_NUMBER (Port: $PORT) has been uninstalled."
-        else
-            echo "❌ GaiaNet Node $NODE_NUMBER (Port: $PORT) is not installed."
-        fi
-    else
-        echo "Uninstallation aborted."
-    fi
-}
-
-# Main script logic
-case "$1" in
     11)
-        echo "Which node do you want to uninstall? (1-4)"
+        echo "Which node do you want to uninstall? (0-4)"
         read -rp "Enter the node number: " NODE_NUMBER
 
-        if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
-            echo "❌ Invalid input. Please enter a number between 1 and 4."
+        if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 0 and 4."
         else
             PORT=$((8080 + NODE_NUMBER))
             uninstall_node_by_port "$PORT"
@@ -851,7 +852,6 @@ case "$1" in
     *)
         echo "Invalid option. Please try again."
         ;;
-esac
 
         10)
             # Check installed nodes
