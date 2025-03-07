@@ -52,7 +52,7 @@ fi
 
 # List of essential packages to install
 pkgs=(
-    "screen" "lsof" "wget" "htop" "nvtop" "curl" "git" "sudo" "iproute2"
+    "screen" "lsof" "wget" "htop" "nvtop" "curl" "git" "sudo"
 )
 
 # Install each package
@@ -348,8 +348,8 @@ stop_gaianet_node() {
         if [ -f "$HOME/gaianet/bin/gaianet" ]; then
             "$HOME/gaianet/bin/gaianet" stop || { echo "❌ Error: Failed to stop all nodes!"; return 1; }
         # Check if ~/gaianet0/bin/gaianet exists
-        elif [ -f "$BASE_DIR/bin/gaianet" ]; then
-            "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop all nodes!"; return 1; }
+        elif [ -f "$HOME/gaianet1/bin/gaianet" ]; then
+            "$HOME/gaianet1/bin/gaianet" stop || { echo "❌ Error: Failed to stop all nodes!"; return 1; }
         else
             echo "❌ Gaianet node not found. Unable to stop all nodes."
             return 1
@@ -422,15 +422,13 @@ restart_gaianet_node() {
     fi
 }
 
-#!/bin/bash
-
 # Function to check if a node is running by checking its port
 check_node_status() {
     local NODE_NUMBER=$1
     local PORT=$((8080 + NODE_NUMBER))  # Calculate the port based on the node number
 
     # Check if the port is open and listening
-    if ss -lnt | grep -q ":$PORT "; then
+    if lsof -i :$PORT > /dev/null 2>&1; then
         echo "Node Status: Running 🟢 (Port $PORT)"
     else
         echo "Node Status: Stopped 🔴 (Port $PORT)"
