@@ -761,7 +761,7 @@ case $choice in
 
 8)
     echo "Which node do you want to stop? (0-4) or 'all' to stop all nodes"
-    read -rp "Enter the spesefic node number or type 'all': " NODE_NUMBER
+    read -rp "Enter the specific node number or type 'all': " NODE_NUMBER
 
     if [[ "$NODE_NUMBER" == "all" || "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
         stop_gaianet_node "$NODE_NUMBER"
