@@ -344,24 +344,14 @@ start_gaianet_node() {
     fi
 }
 
-# Function to stop a specific node based on its active port number
+# Function to stop all node
 stop_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    local PORT=$((8080 + NODE_NUMBER))
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-
-        # Find the process ID (PID) listening on the node's port
-        PID=$(lsof -t -i :$PORT)
-        if [ -n "$PID" ]; then
-            echo "🛑 Killing process $PID listening on port $PORT..."
-            kill -9 "$PID" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
-            echo "✅ GaiaNet Node $NODE_NUMBER stopped."
-        else
-            echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
-        fi
+        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
     else
         echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
     fi
