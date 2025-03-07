@@ -657,6 +657,7 @@ case $choice in
             ;;
 
         7)
+        case $choice in
         echo "Which node do you want to restart? (1-4)"
         read -rp "Enter the node number: " NODE_NUMBER
         if [[ ! "$NODE_NUMBER" =~ ^[1-4]$ ]]; then
