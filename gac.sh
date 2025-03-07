@@ -36,25 +36,25 @@ set_api_url() {
 
     if [ "$system_type" -eq 0 ]; then
         # VPS
-        API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-        API_NAME="Hyper"
+        API_URL="https://soneium.gaia.domains/v1/chat/completions"
+        API_NAME="Soneium"
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+            API_NAME="Gacrypto"
+        else
             API_URL="https://soneium.gaia.domains/v1/chat/completions"
             API_NAME="Soneium"
-        else
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="Hyper"
         fi
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
-            API_NAME="Gadao"
-        else
             API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="Hyper"
+            API_NAME="Gacrypto"
+        else
+            API_URL="https://soneium.gaia.domains/v1/chat/completions"
+            API_NAME="Soneium"
         fi
     fi
 
@@ -80,17 +80,59 @@ fi
 
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
-    if [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    if [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
-            "What sound does a cat make?"
-            "Which number comes after 4?"
-            "What is the opposite of 'hot'?"
-            "What do you use to brush your teeth?"
-            "What is the first letter of the alphabet?"
-            "What shape is a football?"
-            "How many fingers do humans have?"
+    "What do you wear on your head when riding a bike?"
+    "Which is the smallest country in the world by land area?"
+    "What is the chemical symbol for gold?"
+    "Who was the first President of the United States?"
+    "Which planet has the most moons in our solar system?"
+    "What is the hardest natural substance on Earth?"
+    "Which ocean is the largest by surface area?"
+    "Who wrote the play Romeo and Juliet?"
+    "What is the national currency of the United Kingdom?"
+    "Which element is necessary for breathing and survival?"
+    "What is the tallest mountain in the world?"
+    "Which is the largest desert in the world?"
+    "Who painted the famous artwork Mona Lisa?"
+    "What is the capital of Australia?"
+    "Which gas is most abundant in Earth's atmosphere?"
+    "Who discovered penicillin?"
+    "Which continent has the most countries?"
+    "What is the national flower of India?"
+    "How many bones are there in the adult human body?"
+    "Which bird is known for its ability to mimic human speech?"
+    "What is the currency of Japan?"
+    "Which is the longest wall in the world?"
+    "What is the main ingredient in traditional Japanese miso soup?"
+    "Which is the only planet that rotates on its side?"
+    "What is the name of the fairy tale character who leaves a glass slipper behind at a royal ball?"
+    "Who invented the light bulb?"
+    "Which country is famous for the Great Pyramids of Giza?"
+    "What is the chemical formula of water?"
+    "What is the fastest land animal in the world?"
+    "Who is known as the 'Father of Computers'?"
+    "Which two colors are on the flag of Canada?"
+    "Which planet is the hottest in the solar system?"
+    "Who wrote the famous book The Origin of Species?"
+    "What is the main language spoken in Brazil?"
+    "Which country is known as the Land of the Rising Sun?"
+    "What is the longest railway in the world?"
+    "Which element is represented by the symbol 'O' on the periodic table?"
+    "Which organ in the human body produces insulin?"
+    "What is the deepest ocean in the world?"
+    "Who was the first woman to win a Nobel Prize?"
+    "Which sport is played at Wimbledon?"
+    "Why do leaves change color in autumn?"
+    "What is the greenhouse effect and why is it important?"
+    "How do airplanes stay in the air despite their weight?"
+    "Why do we have different time zones around the world?"
+    "What causes tides in the ocean?"
+    "How does a rainbow form in the sky?"
+    "What is the purpose of the United Nations?"
+    "How does a compass work to show direction?"
         )
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
     "What do you wear on your head when riding a bike?"
     "Which is the smallest country in the world by land area?"
