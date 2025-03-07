@@ -392,9 +392,9 @@ display_node_info() {
     fi
 }
 
-# Function to check installed nodes
+# Function to check installed nodes and their port status
 check_installed_nodes() {
-    echo "🔍 Checking installed GaiaNet nodes..."
+    echo "🔍 Checking installed GaiaNet nodes and port status..."
 
     # Loop through all gaianet directories
     for dir in "$HOME"/gaianet*; do
@@ -416,11 +416,18 @@ check_installed_nodes() {
                 STATUS="❌ Not Installed"
             fi
 
+            # Check if the port is active
+            if lsof -i :$PORT > /dev/null 2>&1; then
+                PORT_STATUS="🟢 Active (Port $PORT)"
+            else
+                PORT_STATUS="🔴 Inactive (Port $PORT)"
+            fi
+
             # Display node information
             echo "Node $NODE_NUMBER:"
             echo "  Directory: $dir"
-            echo "  Port: $PORT"
             echo "  Status: $STATUS"
+            echo "  Port Status: $PORT_STATUS"
             echo "----------------------------------------"
         fi
     done
