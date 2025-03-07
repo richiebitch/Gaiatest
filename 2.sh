@@ -338,21 +338,59 @@ start_gaianet_node() {
 
 # Function to stop all node
 stop_gaianet_node() {
-    echo "🛑 Stopping all GaiaNet nodes..."
+    local NODE_NUMBER=$1
 
-    # Loop through all nodes (0 to 4)
-    for NODE_NUMBER in {0..4}; do
+    if [[ "$NODE_NUMBER" == "all" ]]; then
+        # Stop all nodes individually
+        echo "🛑 Stopping all GaiaNet nodes..."
+        for NODE in {0..4}; do
+            local BASE_DIR="$HOME/gaianet$NODE"
+            local PORT=$((8080 + NODE))
+
+            if [ -f "$BASE_DIR/bin/gaianet" ]; then
+                echo "🛑 Stopping GaiaNet Node $NODE..."
+
+                # Find and kill the process(es) listening on the node's port
+                PIDS=$(lsof -t -i :$PORT)
+                if [ -n "$PIDS" ]; then
+                    echo "🛑 Killing process(es) listening on port $PORT..."
+                    for PID in $PIDS; do
+                        echo "🛑 Killing process $PID..."
+                        kill -9 "$PID" || { echo "❌ Error: Failed to stop process $PID!"; return 1; }
+                    done
+                    echo "✅ GaiaNet Node $NODE stopped."
+                else
+                    echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
+                fi
+            else
+                echo "❌ GaiaNet Node $NODE is not installed."
+            fi
+        done
+        echo "✅ All GaiaNet nodes stopped."
+    else
+        # Stop a specific node by killing the process(es) listening on its port
         local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+        local PORT=$((8080 + NODE_NUMBER))
 
         if [ -f "$BASE_DIR/bin/gaianet" ]; then
             echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-            "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet Node $NODE_NUMBER!"; return 1; }
-        else
-            echo "ℹ️ GaiaNet Node $NODE_NUMBER is not installed."
-        fi
-    done
 
-    echo "✅ All GaiaNet nodes stopped."
+            # Find and kill the process(es) listening on the node's port
+            PIDS=$(lsof -t -i :$PORT)
+            if [ -n "$PIDS" ]; then
+                echo "🛑 Killing process(es) listening on port $PORT..."
+                for PID in $PIDS; do
+                    echo "🛑 Killing process $PID..."
+                    kill -9 "$PID" || { echo "❌ Error: Failed to stop process $PID!"; return 1; }
+                done
+                echo "✅ GaiaNet Node $NODE_NUMBER stopped."
+            else
+                echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
+            fi
+        else
+            echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
+        fi
+    fi
 }
 
 # Function to restart a specific node without logging
@@ -734,22 +772,13 @@ case $choice in
 
 8)
     echo "Which node do you want to stop? (0-4) or 'all' to stop all nodes"
-    read -rp "Enter the specific node number or type 'all': " NODE_NUMBER
+    read -rp "Enter the node number or 'all': " NODE_NUMBER
 
-    if [[ "$NODE_NUMBER" == "all" ]]; then
-        # Stop all nodes
-        echo "🛑 Stopping all GaiaNet nodes..."
-        for NODE in {0..4}; do
-            stop_gaianet_node "$NODE"
-        done
-    elif [[ "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
-        # Stop a specific node
+    if [[ "$NODE_NUMBER" == "all" || "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
         stop_gaianet_node "$NODE_NUMBER"
     else
         echo "❌ Invalid input. Please enter a number between 0 and 4 or 'all'."
     fi
-
-    read -rp "Press Enter to return to the main menu..."
     ;;
 
         9)
