@@ -376,14 +376,18 @@ restart_gaianet_node() {
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
 
-        # Stop the node by killing the process listening on its port
+        # Stop the node by killing the process(es) listening on its port
         echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-        PID=$(lsof -t -i :$PORT)
-        if [ -n "$PID" ]; then
-            echo "🛑 Killing process $PID listening on port $PORT..."
-            kill -9 "$PID" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+        PIDS=$(lsof -t -i :$PORT)
+        if [ -n "$PIDS" ]; then
+            echo "🛑 Killing process(es) listening on port $PORT..."
+            for PID in $PIDS; do
+                echo "🛑 Killing process $PID..."
+                kill -9 "$PID" || { echo "❌ Error: Failed to stop process $PID!"; return 1; }
+            done
+            echo "✅ GaiaNet Node $NODE_NUMBER stopped."
         else
-            echo "ℹ️ No process found listening on port $PORT."
+            echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
         fi
 
         # Start the node without logging
