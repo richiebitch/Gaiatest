@@ -80,7 +80,7 @@ fi
 
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
-    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
+    if [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
     "Why is the Renaissance considered a turning point in history?"
     "How did the Industrial Revolution change the world?"
