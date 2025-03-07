@@ -357,21 +357,28 @@ stop_gaianet_node() {
     fi
 }
 
-# Function to restart a specific node
+# Function to restart a specific node without stopping shared services
 restart_gaianet_node() {
     local NODE_NUMBER=$1
     local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+    local PORT=$((8080 + NODE_NUMBER))
 
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
 
-        # Stop the node if it's running
+        # Stop the node by killing the process listening on its port
         echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+        PID=$(lsof -t -i :$PORT)
+        if [ -n "$PID" ]; then
+            echo "🛑 Killing process $PID listening on port $PORT..."
+            kill -9 "$PID" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
+        else
+            echo "ℹ️ No process found listening on port $PORT."
+        fi
 
         # Start the node
         echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
-        "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
+        nohup "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start GaiaNet node!"; return 1; }
 
         echo "✅ GaiaNet Node $NODE_NUMBER restarted."
     else
