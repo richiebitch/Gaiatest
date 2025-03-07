@@ -588,8 +588,8 @@ while true; do
     # Performance & Requirement Section
     echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
     echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
-    echo -e "\e[1;94m☁️  VPS Requirements: 8 Core+ CPU & 6-8GB RAM (Higher is Better) ⚡\e[0m"
-    echo -e "\e[1;92m💻  Supported GPUs: RTX 20/30/40/50 Series Or Higher 🟢\e[0m"
+    echo -e "\e[1;94m☁️  1 NODE Required 4 GB RAM, U Must Have 20 GB Free RAM For 4 Nodes ⚡\e[0m"
+    echo -e "\e[1;92m💻  Must Create 1 New Gaia Account & Claim 500 Credits for 1 Node (4 Nodes = 4 Gaia-Accounts) 🟢\e[0m"
     echo "==============================================================="
     echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
     echo "==============================================================="
