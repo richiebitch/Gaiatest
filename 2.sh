@@ -338,15 +338,21 @@ start_gaianet_node() {
 
 # Function to stop all node
 stop_gaianet_node() {
-    local NODE_NUMBER=$1
-    local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+    echo "🛑 Stopping all GaiaNet nodes..."
 
-    if [ -f "$BASE_DIR/bin/gaianet" ]; then
-        echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-        "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet node!"; return 1; }
-    else
-        echo "❌ GaiaNet Node $NODE_NUMBER is not installed."
-    fi
+    # Loop through all nodes (0 to 4)
+    for NODE_NUMBER in {0..4}; do
+        local BASE_DIR="$HOME/gaianet$NODE_NUMBER"
+
+        if [ -f "$BASE_DIR/bin/gaianet" ]; then
+            echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
+            "$BASE_DIR/bin/gaianet" stop --base "$BASE_DIR" || { echo "❌ Error: Failed to stop GaiaNet Node $NODE_NUMBER!"; return 1; }
+        else
+            echo "ℹ️ GaiaNet Node $NODE_NUMBER is not installed."
+        fi
+    done
+
+    echo "✅ All GaiaNet nodes stopped."
 }
 
 # Function to restart a specific node without logging
@@ -726,16 +732,25 @@ case $choice in
         read -rp "Press Enter to return to the main menu..."
         ;;
 
-        8)
-        echo "Which node do you want to stop? (0-4)"
-        read -rp "Enter the node number: " NODE_NUMBER
-        if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
-            echo "❌ Invalid input. Please enter a number between 1 and 4."
-        else
-            stop_gaianet_node "$NODE_NUMBER"
-        fi
-        read -rp "Press Enter to return to the main menu..."
-        ;;
+8)
+    echo "Which node do you want to stop? (0-4) or 'all' to stop all nodes"
+    read -rp "Enter the specific node number or type 'all': " NODE_NUMBER
+
+    if [[ "$NODE_NUMBER" == "all" ]]; then
+        # Stop all nodes
+        echo "🛑 Stopping all GaiaNet nodes..."
+        for NODE in {0..4}; do
+            stop_gaianet_node "$NODE"
+        done
+    elif [[ "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+        # Stop a specific node
+        stop_gaianet_node "$NODE_NUMBER"
+    else
+        echo "❌ Invalid input. Please enter a number between 0 and 4 or 'all'."
+    fi
+
+    read -rp "Press Enter to return to the main menu..."
+    ;;
 
         9)
             echo "Which node do you want to check? (1-4)"
