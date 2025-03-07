@@ -52,7 +52,7 @@ fi
 
 # List of essential packages to install
 pkgs=(
-    "screen" "lsof" "wget" "htop" "nvtop" "curl" "git" "sudo"
+    "screen" "lsof" "wget" "htop" "nvtop" "curl" "git" "sudo" "iproute2"
 )
 
 # Install each package
