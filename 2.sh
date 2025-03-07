@@ -592,9 +592,6 @@ case $choice in
             for ((i=1; i<=NODE_COUNT; i++)); do
                 install_gaianet_node "$i" "$CONFIG_URL"
             done
-
-            # Return to the main menu
-            read -rp "Press Enter to return to the main menu..."
         fi
         ;;
 
@@ -734,7 +731,6 @@ case $choice in
         5)
         echo "🔍 Check Chat-Bot Active or Not..."
         select_screen_session
-        read -rp "Press Enter to return to the main menu..."
         ;;
 
         6)
@@ -756,7 +752,6 @@ case $choice in
         else
             restart_gaianet_node "$NODE_NUMBER"
         fi
-        read -rp "Press Enter to return to the main menu..."
         ;;
 
 8)
