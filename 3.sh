@@ -631,6 +631,44 @@ uninstall_node_by_port() {
     fi
 }
 
+# Function to update the port configuration for all installed nodes
+update_all_gaianet_ports() {
+    echo "🔄 Updating port configuration for all installed GaiaNet nodes..."
+
+    for NODE_NUMBER in {0..4}; do
+        # Set the base directory and predefined port based on the node number
+        if [[ "$NODE_NUMBER" -eq 0 ]]; then
+            BASE_DIR="$HOME/gaianet"  # Default directory for node 0
+            PORT=8090  # Predefined port for node 0
+        else
+            BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
+            PORT=$((8090 + NODE_NUMBER))  # Predefined ports for nodes 1-4
+        fi
+
+        # Check if the node is installed
+        if [ -f "$BASE_DIR/bin/gaianet" ]; then
+            echo "🔧 Updating port configuration for GaiaNet Node $NODE_NUMBER to $PORT..."
+
+            # Stop the node if it's running
+            echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
+            stop_gaianet_node "$NODE_NUMBER" || { echo "❌ Error: Failed to stop node $NODE_NUMBER!"; continue; }
+
+            # Update the port configuration
+            "$BASE_DIR/bin/gaianet" config --base "$BASE_DIR" --port "$PORT" || { echo "❌ Port configuration failed."; continue; }
+
+            # Restart the node to apply the changes
+            echo "🚀 Restarting GaiaNet Node $NODE_NUMBER with new port $PORT..."
+            "$BASE_DIR/bin/gaianet" start --base "$BASE_DIR" || { echo "❌ Error: Failed to start node $NODE_NUMBER!"; continue; }
+
+            echo "✅ Port configuration updated successfully for GaiaNet Node $NODE_NUMBER."
+        else
+            echo "ℹ️ GaiaNet Node $NODE_NUMBER is not installed. Skipping..."
+        fi
+    done
+
+    echo "🎉 Port configuration updated for all installed GaiaNet nodes."
+}
+
 # Main menu
 while true; do
     clear
@@ -668,6 +706,10 @@ echo -e "10) \e[1m📋  Check Installed & Active Nodes\e[0m"
 echo -e "0) \e[1m❌  Exit Installer\e[0m"
 echo "==============================================================="
 echo -e "11) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
+echo "==============================================================="
+
+echo "==============================================================="
+echo -e "12) \e[1;34m🌐 Update port for all installed nodes)\e[0m"
 echo "==============================================================="
 
     
@@ -897,6 +939,11 @@ case $choice in
             # Check installed nodes
             check_installed_nodes
             ;;
+
+12)
+    echo "🔄 Updating port configuration for all installed GaiaNet nodes..."
+    update_all_gaianet_ports
+    ;;
 
         0)
             echo "Exiting..."
