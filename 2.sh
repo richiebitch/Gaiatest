@@ -382,9 +382,18 @@ stop_gaianet_node() {
     fi
 }
 
-# Function to restart a specific node without logging
 restart_gaianet_node() {
     local NODE_NUMBER=$1
+
+    # If "all" is passed, restart all nodes (0-4)
+    if [[ "$NODE_NUMBER" == "all" ]]; then
+        echo "🔄 Restarting all GaiaNet nodes (0-4)..."
+        for i in {0..4}; do
+            restart_gaianet_node "$i"
+        done
+        echo "✅ All GaiaNet nodes restarted."
+        return
+    fi
 
     # Set the base directory and port based on the node number
     if [[ "$NODE_NUMBER" -eq 0 ]]; then
@@ -398,19 +407,8 @@ restart_gaianet_node() {
     if [ -f "$BASE_DIR/bin/gaianet" ]; then
         echo "🔄 Restarting GaiaNet Node $NODE_NUMBER..."
 
-        # Stop the node by killing the process(es) listening on its port
-        echo "🛑 Stopping GaiaNet Node $NODE_NUMBER..."
-        PIDS=$(lsof -t -i :$PORT)
-        if [ -n "$PIDS" ]; then
-            echo "🛑 Killing process(es) listening on port $PORT..."
-            for PID in $PIDS; do
-                echo "🛑 Killing process $PID..."
-                kill -9 "$PID" || { echo "❌ Error: Failed to stop process $PID!"; return 1; }
-            done
-            echo "✅ GaiaNet Node $NODE_NUMBER stopped."
-        else
-            echo "ℹ️ No process found listening on port $PORT. Node may already be stopped."
-        fi
+        # Stop the node first
+        stop_gaianet_node "$NODE_NUMBER" || { echo "❌ Error: Failed to stop node $NODE_NUMBER!"; return 1; }
 
         # Start the node without logging
         echo "🚀 Starting GaiaNet Node $NODE_NUMBER..."
@@ -853,7 +851,13 @@ case $choice in
             echo -e "\e[32m✅ All 'gaiabot' screen sessions have been killed and wiped.\e[0m"
             ;;
 
-        7)
+7)
+    echo "Do you want to restart a specific node or all nodes?"
+    echo "1) Restart a specific node (0-4)"
+    echo "2) Restart all nodes (0-4)"
+    read -rp "Enter your choice (1 or 2): " CHOICE
+
+    if [[ "$CHOICE" == "1" ]]; then
         echo "Which node do you want to restart? (0-4)"
         read -rp "Enter the node number: " NODE_NUMBER
         if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
@@ -861,17 +865,16 @@ case $choice in
         else
             restart_gaianet_node "$NODE_NUMBER"
         fi
-        ;;
+    elif [[ "$CHOICE" == "2" ]]; then
+        restart_gaianet_node "all"
+    else
+        echo "❌ Invalid choice. Please enter 1 or 2."
+    fi
+    ;;
 
 8)
-    echo "Which node do you want to stop? (0-4) or 'all' to stop all nodes"
-    read -rp "Enter the specific node number or type 'all': " NODE_NUMBER
-
-    if [[ "$NODE_NUMBER" == "all" || "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
-        stop_gaianet_node "$NODE_NUMBER"
-    else
-        echo "❌ Invalid input. Please enter a number between 0 and 4 or 'all'."
-    fi
+    echo "🛑 Stopping all GaiaNet nodes (0-4)..."
+    stop_gaianet_node "all"
     ;;
 
         9)
