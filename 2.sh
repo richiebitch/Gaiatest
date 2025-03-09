@@ -694,16 +694,6 @@ while true; do
     
 # Menu Options
 echo -e "\n\e[1mSelect an action:\e[0m\n"
-echo -e "1) \e[1m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
-echo -e "3) \e[1m🎮  Install Gaia-Node (NVIDIA GPU Desktop/Laptop/VSP)\e[0m"
-echo -e "4) \e[1m🤖  Start Auto Chat With AI-Agent\e[0m"
-echo -e "5) \e[1m🔍 Check Chatting With AI-Agent Active or Not\e[0m"
-echo -e "6) \e[1m✋  Stop Auto Chatting With AI-Agent\e[0m"
-echo -e "7) \e[1m🔄  Restart GaiaNet Node\e[0m"
-echo -e "8) \e[1m⏹️  Stop All GaiaNet Nodes\e[0m"
-echo -e "9) \e[1m🔍  Check Your Gaia Node ID & Device ID\e[0m"
-echo -e "10) \e[1m📋  Check Installed & Active Nodes\e[0m"
-echo -e "0) \e[1m❌  Exit Installer\e[0m"
 echo "==============================================================="
 echo -e "11) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
 echo "==============================================================="
