@@ -674,23 +674,6 @@ while true; do
     clear
     echo "==============================================================="
     echo -e "\e[1;36m🚀🚀 GAIANET MULTI-NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀\e[0m"
-
-    echo -e "\e[1;85m📢 Stay updated:\e[0m"
-    echo -e "\e[1;85m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
-    echo -e "\e[1;85m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
-
-    echo "==============================================================="
-    echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter a Lot for Optimal Performance! ✨\e[0m"
-    echo "==============================================================="
-    
-    # Performance & Requirement Section
-    echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
-    echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
-    echo -e "\e[1;94m☁️  1 NODE Required 4 GB RAM, U Must Have 20 GB Free RAM For 4 Nodes ⚡\e[0m"
-    echo -e "\e[1;92m💻  Must Create 1 New Gaia Account & Claim 500 Credits for 1 Node (4 Nodes = 4 Gaia-Accounts) 🟢\e[0m"
-    echo "==============================================================="
-    echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
-    echo "==============================================================="
     
 # Menu Options
 echo -e "\n\e[1mSelect an action:\e[0m\n"
