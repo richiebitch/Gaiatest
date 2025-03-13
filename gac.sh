@@ -41,8 +41,8 @@ set_api_url() {
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
-            API_NAME="gadao"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+            API_NAME="gacrypto"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="hyper"
@@ -50,8 +50,8 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
-            API_NAME="gadao"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+            API_NAME="gacrypto"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="hyper"
@@ -122,7 +122,7 @@ generate_random_general_question() {
     # Check if API_URL is set and matches any of the specified URLs
     if [[ -n "$API_URL" ]]; then
         case "$API_URL" in
-            "https://hyper.gaia.domains/v1/chat/completions" | "https://gadao.gaia.domains/v1/chat/completions")
+            "https://hyper.gaia.domains/v1/chat/completions" | "https://gacrypto.gaia.domains/v1/chat/completions")
                 # Use the general_questions array as is
                 ;;
             *)
