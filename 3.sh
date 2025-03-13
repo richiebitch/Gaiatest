@@ -719,14 +719,22 @@ case $choice in
     1|2|3)
         echo "How many nodes do you want to install? (1-10)"
         read -rp "Enter the number of nodes: " NODE_COUNT
-        if [[ ! "$NODE_COUNT" =~ ^[1-10]$ ]]; then
-            echo "❌ Invalid input. Please enter a number between 1 and 4."
+        if [[ ! "$NODE_COUNT" =~ ^[1-9]$|^10$ ]]; then
+            echo "❌ Invalid input. Please enter a number between 1 and 10."
         else
+            # Check system resources before proceeding
+            if ! check_system_resources "$NODE_COUNT"; then
+                echo "❌ Insufficient resources to install $NODE_COUNT nodes."
+                exit 1
+            fi
+
             # Check for NVIDIA GPU and install CUDA if available
             if check_nvidia_gpu; then
                 if ! setup_cuda_env; then
-                    check_cuda_installed
-                    install_cuda
+                    if ! install_cuda; then
+                        echo "❌ Failed to install CUDA. Exiting."
+                        exit 1
+                    fi
                 else
                     echo "⚠️ CUDA is already installed. Skipping CUDA installation."
                 fi
@@ -735,12 +743,20 @@ case $choice in
             fi
 
             # Determine the configuration URL based on system type and GPU availability
-            set_config_url
+            if ! set_config_url; then
+                echo "❌ Failed to set configuration URL. Exiting."
+                exit 1
+            fi
 
             # Install the specified number of nodes
             for ((i=1; i<=NODE_COUNT; i++)); do
-                install_gaianet_node "$i" "$CONFIG_URL"
+                if ! install_gaianet_node "$i" "$CONFIG_URL"; then
+                    echo "❌ Failed to install Node $i. Exiting."
+                    exit 1
+                fi
             done
+
+            echo "🎉 Successfully installed $NODE_COUNT nodes!"
         fi
         ;;
 
