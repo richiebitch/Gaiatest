@@ -745,6 +745,7 @@ case $choice in
             # Check for NVIDIA GPU and install CUDA if available
             if check_nvidia_gpu; then
                 if ! setup_cuda_env; then
+                    if ! check_cuda_installed; then
                     if ! install_cuda; then
                         echo "❌ Failed to install CUDA. Exiting."
                         exit 1
