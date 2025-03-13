@@ -587,48 +587,43 @@ stop_node_by_port() {
     fi
 }
 
-# Function to uninstall a node by port number
 uninstall_node_by_port() {
     local NODE_NUMBER=$1
     local PORT=$((8090 + NODE_NUMBER))
-    local BASE_DIR
+    local BASE_DIR="$HOME/gaianet${NODE_NUMBER:+-$NODE_NUMBER}"
 
-    if [[ "$NODE_NUMBER" == "0" ]]; then
-        BASE_DIR="$HOME/gaianet"  # Default node directory
-    else
-        BASE_DIR="$HOME/gaianet$NODE_NUMBER"
-    fi
+    echo "⚠️ WARNING: This will remove GaiaNet Node $NODE_NUMBER (Port: $PORT)!"
+    read -rp "Proceed? (y/n) " confirm
+    [[ "$confirm" != "y" ]] && echo "Uninstallation aborted." && return
 
-    echo "⚠️ WARNING: This will completely remove GaiaNet Node $NODE_NUMBER (Port: $PORT) from your system!"
-    read -rp "Are you sure you want to proceed? (y/n) " confirm
-    if [[ "$confirm" != "y" ]]; then
-        echo "Uninstallation aborted."
-        return
-    fi
+    echo "🔍 Checking if Node $NODE_NUMBER (Port: $PORT) is running..."
+    check_node_status "$NODE_NUMBER" && { echo "🛑 Stopping Node $NODE_NUMBER..."; stop_node_by_port "$PORT" || { echo "❌ Failed to stop Node $NODE_NUMBER."; return; } }
 
-    echo "🔍 Checking if GaiaNet Node $NODE_NUMBER (Port: $PORT) is running..."
-    if check_node_status "$NODE_NUMBER"; then
-        echo "🛑 GaiaNet Node $NODE_NUMBER (Port: $PORT) is currently running. Stopping it now..."
-        if stop_node_by_port "$PORT"; then
-            echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER (Port: $PORT)..."
-            if [ -d "$BASE_DIR" ]; then
-                rm -rf "$BASE_DIR"
-                echo "✅ GaiaNet Node $NODE_NUMBER (Port: $PORT) has been uninstalled."
-            else
-                echo "❌ GaiaNet Node $NODE_NUMBER (Port: $PORT) is not installed."
-            fi
-        else
-            echo "❌ Failed to stop GaiaNet Node $NODE_NUMBER (Port: $PORT). Uninstallation aborted."
-        fi
-    else
-        echo "🗑️ Uninstalling GaiaNet Node $NODE_NUMBER (Port: $PORT)..."
-        if [ -d "$BASE_DIR" ]; then
-            rm -rf "$BASE_DIR"
-            echo "✅ GaiaNet Node $NODE_NUMBER (Port: $PORT) has been uninstalled."
-        else
-            echo "❌ GaiaNet Node $NODE_NUMBER (Port: $PORT) is not installed."
-        fi
-    fi
+    echo "🗑️ Uninstalling Node $NODE_NUMBER..."
+    [ -d "$BASE_DIR" ] && rm -rf "$BASE_DIR" && echo "✅ Node $NODE_NUMBER uninstalled." || echo "❌ Node $NODE_NUMBER not found."
+}
+
+list_installed_nodes() {
+    local nodes=("$HOME"/gaianet*)
+    [ ${#nodes[@]} -eq 0 ] && echo "No nodes found." && return 1
+    echo "Installed nodes:"
+    for dir in "${nodes[@]}"; do [ -d "$dir" ] && echo "- $(basename "$dir")"; done
+}
+
+uninstall_all_nodes() {
+    echo "🔧 Uninstalling all nodes..."
+    for dir in "$HOME"/gaianet*; do [ -d "$dir" ] && uninstall_node_by_port "$(basename "$dir" | sed 's/gaianet//')"; done
+    echo "✅ All nodes uninstalled."
+}
+
+uninstall_gaianet_nodes() {
+    echo "Uninstall GaiaNet Nodes\n======================"
+    list_installed_nodes || return 1
+
+    read -rp "Uninstall which node? (Enter number or 'all'): " UNINSTALL_CHOICE
+    [[ "$UNINSTALL_CHOICE" == "all" ]] && uninstall_all_nodes || \
+    [[ "$UNINSTALL_CHOICE" =~ ^[0-9]+$ ]] && uninstall_node_by_port "$UNINSTALL_CHOICE" || \
+    echo "❌ Invalid choice. Enter a number or 'all'."
 }
 
 # Function to update the port configuration for all installed nodes
@@ -934,15 +929,7 @@ case $choice in
             ;;
 
     11)
-            # Option 11: Uninstall a node
-            echo "Which node do you want to uninstall? (0 for default, 1-10 for additional nodes)"
-            read -rp "Enter the node number: " NODE_NUMBER
-
-            if [[ ! "$NODE_NUMBER" =~ ^[0-10]$ ]]; then
-                echo "❌ Invalid input. Please enter a number between 0 and 4."
-            else
-                uninstall_node_by_port "$NODE_NUMBER"
-            fi
+            uninstall_gaianet_nodes
             ;;
 
         10)
