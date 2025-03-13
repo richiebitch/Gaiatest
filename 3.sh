@@ -722,12 +722,6 @@ case $choice in
         if [[ ! "$NODE_COUNT" =~ ^[1-9]$|^10$ ]]; then
             echo "❌ Invalid input. Please enter a number between 1 and 10."
         else
-            # Check system resources before proceeding
-            if ! check_system_resources "$NODE_COUNT"; then
-                echo "❌ Insufficient resources to install $NODE_COUNT nodes."
-                exit 1
-            fi
-
             # Check for NVIDIA GPU and install CUDA if available
             if check_nvidia_gpu; then
                 if ! setup_cuda_env; then
