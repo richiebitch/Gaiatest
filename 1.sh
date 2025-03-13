@@ -164,14 +164,26 @@ add_gaianet_to_path() {
 
 # Main logic
 if check_nvidia_gpu; then
-   setup_cuda_env
-   check_cuda_installed
-    install_cuda
-    setup_cuda_env
-    install_gaianet
-else
-    install_gaianet
+    if ! setup_cuda_env; then
+        echo "⚠️ CUDA environment not set up. Checking if CUDA is installed..."
+        if check_cuda_installed; then
+            echo "⚠️ CUDA is installed but not set up correctly. Please fix the CUDA environment."
+        else
+            echo "CUDA is not installed. Installing CUDA..."
+            if install_cuda; then
+                echo "✅ CUDA installed successfully."
+                setup_cuda_env
+            else
+                echo "❌ Failed to install CUDA. Exiting."
+                exit 1
+            fi
+        fi
+    else
+        echo "✅ CUDA environment is already set up."
+    fi
 fi
+# Install Gaianet
+install_gaianet
 
 # Verify GaiaNet installation
 if [ -f ~/gaianet/bin/gaianet ]; then
