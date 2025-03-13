@@ -385,9 +385,9 @@ stop_gaianet_node() {
 restart_gaianet_node() {
     local NODE_NUMBER=$1
 
-    # If "all" is passed, restart all nodes (0-4)
+    # If "all" is passed, restart all nodes (0-10)
     if [[ "$NODE_NUMBER" == "all" ]]; then
-        echo "🔄 Restarting all GaiaNet nodes (0-4)..."
+        echo "🔄 Restarting all GaiaNet nodes (0-10)..."
         for i in {0..4}; do
             restart_gaianet_node "$i"
         done
@@ -719,7 +719,7 @@ case $choice in
     1|2|3)
         echo "How many nodes do you want to install? (1-4)"
         read -rp "Enter the number of nodes: " NODE_COUNT
-        if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
+        if [[ ! "$NODE_COUNT" =~ ^[1-10]$ ]]; then
             echo "❌ Invalid input. Please enter a number between 1 and 4."
         else
             # Check for NVIDIA GPU and install CUDA if available
@@ -895,14 +895,14 @@ case $choice in
 
 7)
     echo "Do you want to restart a specific node or all nodes?"
-    echo "1) Restart a specific node (0-4)"
-    echo "2) Restart all nodes (0-4)"
+    echo "1) Restart a specific node (0-10)"
+    echo "2) Restart all nodes (0-10)"
     read -rp "Enter your choice (1 or 2): " CHOICE
 
     if [[ "$CHOICE" == "1" ]]; then
-        echo "Which node do you want to restart? (0-4)"
+        echo "Which node do you want to restart? (0-10)"
         read -rp "Enter the node number: " NODE_NUMBER
-        if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+        if [[ ! "$NODE_NUMBER" =~ ^[0-10]$ ]]; then
             echo "❌ Invalid input. Please enter a number between 0 and 4."
         else
             restart_gaianet_node "$NODE_NUMBER"
@@ -915,7 +915,7 @@ case $choice in
     ;;
 
 8)
-    echo "🛑 Stopping all GaiaNet nodes (0-4)..."
+    echo "🛑 Stopping all GaiaNet nodes (0-10)..."
     stop_gaianet_node "all"
     ;;
 
@@ -928,7 +928,7 @@ case $choice in
             echo "Which node do you want to uninstall? (0 for default, 1-4 for additional nodes)"
             read -rp "Enter the node number: " NODE_NUMBER
 
-            if [[ ! "$NODE_NUMBER" =~ ^[0-4]$ ]]; then
+            if [[ ! "$NODE_NUMBER" =~ ^[0-10]$ ]]; then
                 echo "❌ Invalid input. Please enter a number between 0 and 4."
             else
                 uninstall_node_by_port "$NODE_NUMBER"
