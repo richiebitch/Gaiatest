@@ -388,7 +388,7 @@ restart_gaianet_node() {
     # If "all" is passed, restart all nodes (0-10)
     if [[ "$NODE_NUMBER" == "all" ]]; then
         echo "🔄 Restarting all GaiaNet nodes (0-10)..."
-        for i in {0..4}; do
+        for i in {0..10}; do
             restart_gaianet_node "$i"
         done
         echo "✅ All GaiaNet nodes restarted."
@@ -635,7 +635,7 @@ uninstall_node_by_port() {
 update_all_gaianet_ports() {
     echo "🔄 Updating port configuration for all installed GaiaNet nodes..."
 
-    for NODE_NUMBER in {0..4}; do
+    for NODE_NUMBER in {0..10}; do
         # Set the base directory and predefined port based on the node number
         if [[ "$NODE_NUMBER" -eq 0 ]]; then
             BASE_DIR="$HOME/gaianet"  # Default directory for node 0
