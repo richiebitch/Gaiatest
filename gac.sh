@@ -41,8 +41,8 @@ set_api_url() {
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="Gacrypto"
+            API_URL="https://gadao.gaia.domains/v1/chat/completions"
+            API_NAME="gadao"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="hyper"
@@ -50,8 +50,8 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="Gacrypto"
+            API_URL="https://gadao.gaia.domains/v1/chat/completions"
+            API_NAME="gadao"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="hyper"
@@ -120,7 +120,7 @@ generate_random_general_question() {
     "Why is Pi considered an irrational number, and why is it useful?"
     "How does statistics help in making informed decisions?"
         )
-    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
     "Why is the Renaissance considered a turning point in history?"
     "How did the Industrial Revolution change the world?"
