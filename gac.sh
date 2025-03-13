@@ -78,130 +78,65 @@ else
     echo "✅ jq is already installed."
 fi
 
-# Function to get a random general question based on the API URL
 generate_random_general_question() {
-    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        general_questions=(
-    "Why is the Renaissance considered a turning point in history?"
-    "How did the Industrial Revolution change the world?"
-    "Why is the Great Wall of China historically significant?"
-    "What were the main causes of World War I?"
-    "How did the printing press impact society?"
-    "Why is the moon landing in 1969 considered a major achievement?"
-    "What led to the fall of the Roman Empire?"
-    "How did the Cold War shape global politics?"
-    "Why is the Amazon rainforest important for the planet?"
-            "What sound does a cat make?"
-            "Which number comes after 4?"
-            "What is the opposite of 'hot'?"
-            "What do you use to brush your teeth?"
-            "What is the first letter of the alphabet?"
-            "What shape is a football?"
-            "How many fingers do humans have?"
-    "How do vaccines work to protect against diseases?"
-    "What are black holes, and why are they important in astronomy?"
-    "How does climate change affect ecosystems?"
-    "Why is the discovery of DNA considered revolutionary?"
-    "How did the internet change modern communication?"
-    "What role does the United Nations play in global peacekeeping?"
-    "Why is the Suez Canal important for global trade?"
-    "How did the Magna Carta influence modern democracy?"
-    "Why is the water cycle crucial for life on Earth?"
-    "What are the main challenges of space exploration?"
-    "How did the discovery of electricity transform society?"
-    "Why is the number zero important in mathematics?"
-    "How is the Fibonacci sequence observed in nature?"
-    "Why is the Pythagorean theorem significant in geometry?"
-    "How does probability influence real-life decision-making?"
-    "What are prime numbers, and why are they important in cryptography?"
-    "Why is calculus essential in modern science and engineering?"
-    "How does the concept of infinity affect mathematical theories?"
-    "What is the significance of Euler’s formula in mathematics?"
-    "Why is Pi considered an irrational number, and why is it useful?"
-    "How does statistics help in making informed decisions?"
-        )
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
-        general_questions=(
-    "Why is the Renaissance considered a turning point in history?"
-    "How did the Industrial Revolution change the world?"
-    "Why is the Great Wall of China historically significant?"
-    "What were the main causes of World War I?"
-    "How did the printing press impact society?"
-    "Why is the moon landing in 1969 considered a major achievement?"
-    "What led to the fall of the Roman Empire?"
-    "How did the Cold War shape global politics?"
-    "Why is the Amazon rainforest important for the planet?"
-            "What sound does a cat make?"
-            "Which number comes after 4?"
-            "What is the opposite of 'hot'?"
-            "What do you use to brush your teeth?"
-            "What is the first letter of the alphabet?"
-            "What shape is a football?"
-            "How many fingers do humans have?"
-    "How do vaccines work to protect against diseases?"
-    "What are black holes, and why are they important in astronomy?"
-    "How does climate change affect ecosystems?"
-    "Why is the discovery of DNA considered revolutionary?"
-    "How did the internet change modern communication?"
-    "What role does the United Nations play in global peacekeeping?"
-    "Why is the Suez Canal important for global trade?"
-    "How did the Magna Carta influence modern democracy?"
-    "Why is the water cycle crucial for life on Earth?"
-    "What are the main challenges of space exploration?"
-    "How did the discovery of electricity transform society?"
-    "Why is the number zero important in mathematics?"
-    "How is the Fibonacci sequence observed in nature?"
-    "Why is the Pythagorean theorem significant in geometry?"
-    "How does probability influence real-life decision-making?"
-    "What are prime numbers, and why are they important in cryptography?"
-    "Why is calculus essential in modern science and engineering?"
-    "How does the concept of infinity affect mathematical theories?"
-    "What is the significance of Euler’s formula in mathematics?"
-    "Why is Pi considered an irrational number, and why is it useful?"
-    "How does statistics help in making informed decisions?"
-        )
-    elif [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
-        general_questions=(
-    "Why is the Renaissance considered a turning point in history?"
-    "How did the Industrial Revolution change the world?"
-    "Why is the Great Wall of China historically significant?"
-    "What were the main causes of World War I?"
-    "How did the printing press impact society?"
-    "Why is the moon landing in 1969 considered a major achievement?"
-    "What led to the fall of the Roman Empire?"
-    "How did the Cold War shape global politics?"
-    "Why is the Amazon rainforest important for the planet?"
-            "What sound does a cat make?"
-            "Which number comes after 4?"
-            "What is the opposite of 'hot'?"
-            "What do you use to brush your teeth?"
-            "What is the first letter of the alphabet?"
-            "What shape is a football?"
-            "How many fingers do humans have?"
-    "How do vaccines work to protect against diseases?"
-    "What are black holes, and why are they important in astronomy?"
-    "How does climate change affect ecosystems?"
-    "Why is the discovery of DNA considered revolutionary?"
-    "How did the internet change modern communication?"
-    "What role does the United Nations play in global peacekeeping?"
-    "Why is the Suez Canal important for global trade?"
-    "How did the Magna Carta influence modern democracy?"
-    "Why is the water cycle crucial for life on Earth?"
-    "What are the main challenges of space exploration?"
-    "How did the discovery of electricity transform society?"
-    "Why is the number zero important in mathematics?"
-    "How is the Fibonacci sequence observed in nature?"
-    "Why is the Pythagorean theorem significant in geometry?"
-    "How does probability influence real-life decision-making?"
-    "What are prime numbers, and why are they important in cryptography?"
-    "Why is calculus essential in modern science and engineering?"
-    "How does the concept of infinity affect mathematical theories?"
-    "What is the significance of Euler’s formula in mathematics?"
-    "Why is Pi considered an irrational number, and why is it useful?"
-    "How does statistics help in making informed decisions?"
-        )
+    local general_questions=(
+        "Why is the Renaissance considered a turning point in history?"
+        "How did the Industrial Revolution change the world?"
+        "Why is the Great Wall of China historically significant?"
+        "What were the main causes of World War I?"
+        "How did the printing press impact society?"
+        "Why is the moon landing in 1969 considered a major achievement?"
+        "What led to the fall of the Roman Empire?"
+        "How did the Cold War shape global politics?"
+        "Why is the Amazon rainforest important for the planet?"
+        "What sound does a cat make?"
+        "Which number comes after 4?"
+        "What is the opposite of 'hot'?"
+        "What do you use to brush your teeth?"
+        "What is the first letter of the alphabet?"
+        "What shape is a football?"
+        "How many fingers do humans have?"
+        "How do vaccines work to protect against diseases?"
+        "What are black holes, and why are they important in astronomy?"
+        "How does climate change affect ecosystems?"
+        "Why is the discovery of DNA considered revolutionary?"
+        "How did the internet change modern communication?"
+        "What role does the United Nations play in global peacekeeping?"
+        "Why is the Suez Canal important for global trade?"
+        "How did the Magna Carta influence modern democracy?"
+        "Why is the water cycle crucial for life on Earth?"
+        "What are the main challenges of space exploration?"
+        "How did the discovery of electricity transform society?"
+        "Why is the number zero important in mathematics?"
+        "How is the Fibonacci sequence observed in nature?"
+        "Why is the Pythagorean theorem significant in geometry?"
+        "How does probability influence real-life decision-making?"
+        "What are prime numbers, and why are they important in cryptography?"
+        "Why is calculus essential in modern science and engineering?"
+        "How does the concept of infinity affect mathematical theories?"
+        "What is the significance of Euler’s formula in mathematics?"
+        "Why is Pi considered an irrational number, and why is it useful?"
+        "How does statistics help in making informed decisions?"
+    )
+
+    # Check if API_URL is set and matches any of the specified URLs
+    if [[ -n "$API_URL" ]]; then
+        case "$API_URL" in
+            "https://hyper.gaia.domains/v1/chat/completions" | "https://gadao.gaia.domains/v1/chat/completions")
+                # Use the general_questions array as is
+                ;;
+            *)
+                # Handle unexpected API_URL values
+                echo "Unsupported API_URL: $API_URL" >&2
+                return 1
+                ;;
+        esac
+    else
+        echo "API_URL is not set." >&2
+        return 1
     fi
 
+    # Return a random question
     echo "${general_questions[$RANDOM % ${#general_questions[@]}]}"
 }
 
