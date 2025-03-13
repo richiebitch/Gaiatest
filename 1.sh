@@ -163,11 +163,11 @@ add_gaianet_to_path() {
 
 # Main logic
 if check_nvidia_gpu; then
-   if ! setup_cuda_env; then
-       check_cuda_installed
-       install_cuda
-       setup_cuda_env
-       install_gaianet
+   setup_cuda_env
+   check_cuda_installed
+    install_cuda
+    setup_cuda_env
+    install_gaianet
 else
     install_gaianet
 fi
