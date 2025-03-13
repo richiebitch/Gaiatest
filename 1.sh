@@ -43,6 +43,18 @@ else
     echo "🖥️ Running on a native Ubuntu system."
 fi
 
+# Check if CUDA is already installed
+check_cuda_installed() {
+    if command -v nvcc &> /dev/null; then
+        CUDA_VERSION=$(nvcc --version | grep -oP 'release \K\d+\.\d+' | cut -d. -f1)
+        echo "✅ CUDA version $CUDA_VERSION is already installed."
+        return 0
+    else
+        echo "⚠️ CUDA is not installed."
+        return 1
+    fi
+}
+
 # Check if an NVIDIA GPU is present
 check_nvidia_gpu() {
     if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
@@ -151,10 +163,11 @@ add_gaianet_to_path() {
 
 # Main logic
 if check_nvidia_gpu; then
-    setup_cuda_env
-    install_cuda
-    setup_cuda_env
-    install_gaianet
+   if ! setup_cuda_env; then
+       check_cuda_installed
+       install_cuda
+       setup_cuda_env
+       install_gaianet
 else
     install_gaianet
 fi
