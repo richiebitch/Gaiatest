@@ -270,7 +270,7 @@ EOF
         fi
     else
         echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
-        sleep 5
+        sleep 2
     fi
 
     # Set sleep time based on API URL
@@ -282,7 +282,7 @@ EOF
         sleep 2
     elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching..."
-        sleep 1
+        sleep 0
     fi
 }
 
