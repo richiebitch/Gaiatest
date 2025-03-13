@@ -175,13 +175,13 @@ set_config_url() {
         if ! check_nvidia_gpu; then
             CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
         else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config.json"
         fi
     elif [[ $SYSTEM_TYPE -eq 2 ]]; then
         if ! check_nvidia_gpu; then
             CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
         else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config.json"
         fi
     else
         echo "⚠️ Unable to determine system type. Using default configuration."
