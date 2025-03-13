@@ -43,18 +43,6 @@ else
     echo "🖥️ Running on a native Ubuntu system."
 fi
 
-# Check if CUDA is already installed
-check_cuda_installed() {
-    if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | grep -oP 'release \K\d+\.\d+' | cut -d. -f1)
-        echo "✅ CUDA version $CUDA_VERSION is already installed."
-        return 0
-    else
-        echo "⚠️ CUDA is not installed."
-        return 1
-    fi
-}
-
 # Check if an NVIDIA GPU is present
 check_nvidia_gpu() {
     if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
@@ -80,6 +68,19 @@ check_system_type() {
         return 2  # Desktop
     fi
 }
+
+# Check if CUDA is already installed
+check_cuda_installed() {
+    if command -v nvcc &> /dev/null; then
+        CUDA_VERSION=$(nvcc --version | grep -oP 'release \K\d+\.\d+' | cut -d. -f1)
+        echo "✅ CUDA version $CUDA_VERSION is already installed."
+        return 0
+    else
+        echo "⚠️ CUDA is not installed."
+        return 1
+    fi
+}
+
 
 # Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
@@ -145,7 +146,7 @@ install_gaianet() {
         echo "✅ CUDA version detected: $CUDA_VERSION"
         if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' -o install.sh
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.21/install.sh' -o install.sh
             chmod +x install.sh
             ./install.sh --ggmlcuda $CUDA_VERSION || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
             return
