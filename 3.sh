@@ -400,7 +400,7 @@ restart_gaianet_node() {
         BASE_DIR="$HOME/gaianet"  # Default directory for node 0
         PORT=8090
     else
-        BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
+        BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-10
         PORT=$((8090 + NODE_NUMBER))
     fi
 
@@ -641,8 +641,8 @@ update_all_gaianet_ports() {
             BASE_DIR="$HOME/gaianet"  # Default directory for node 0
             PORT=8090  # Predefined port for node 0
         else
-            BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-4
-            PORT=$((8090 + NODE_NUMBER))  # Predefined ports for nodes 1-4
+            BASE_DIR="$HOME/gaianet$NODE_NUMBER"  # Directory for nodes 1-10
+            PORT=$((8090 + NODE_NUMBER))  # Predefined ports for nodes 1-10
         fi
 
         # Check if the node is installed
@@ -717,7 +717,7 @@ echo "==============================================================="
 
 case $choice in
     1|2|3)
-        echo "How many nodes do you want to install? (1-4)"
+        echo "How many nodes do you want to install? (1-10)"
         read -rp "Enter the number of nodes: " NODE_COUNT
         if [[ ! "$NODE_COUNT" =~ ^[1-10]$ ]]; then
             echo "❌ Invalid input. Please enter a number between 1 and 4."
@@ -925,7 +925,7 @@ case $choice in
 
     11)
             # Option 11: Uninstall a node
-            echo "Which node do you want to uninstall? (0 for default, 1-4 for additional nodes)"
+            echo "Which node do you want to uninstall? (0 for default, 1-10 for additional nodes)"
             read -rp "Enter the node number: " NODE_NUMBER
 
             if [[ ! "$NODE_NUMBER" =~ ^[0-10]$ ]]; then
