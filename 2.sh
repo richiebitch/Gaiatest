@@ -689,7 +689,7 @@ echo "==============================================================="
     read -rp "Enter your choice: " choice
 
 case $choice in
-    1|2|3)
+
         echo "How many nodes do you want to install? (1-4)"
         read -rp "Enter the number of nodes: " NODE_COUNT
         if [[ ! "$NODE_COUNT" =~ ^[1-4]$ ]]; then
