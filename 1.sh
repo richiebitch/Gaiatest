@@ -206,7 +206,7 @@ elif [[ $SYSTEM_TYPE -eq 1 ]]; then
     if ! check_nvidia_gpu; then
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
     else
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Qwen2.5-0.5B.json"
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Soneium2.5-0.5B.json"
     fi
 elif [[ $SYSTEM_TYPE -eq 2 ]]; then
     # Desktop
