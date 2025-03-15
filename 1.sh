@@ -213,7 +213,7 @@ elif [[ $SYSTEM_TYPE -eq 2 ]]; then
     if ! check_nvidia_gpu; then
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
     else
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Llama3.2_1B.json"
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/gadao3.2_1B.json"
     fi
 fi
 
