@@ -271,7 +271,7 @@ install_gaianet() {
     fi
 
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://raw.githubusercontent.com/abhiag/Gaiatest/main/install21.sh' | bash -s -- --base "$BASE_DIR" || { echo "❌ GaiaNet installation failed."; exit 1; }
+    curl -sSfL 'https://raw.githubusercontent.com/abhiag/Gaiatest/main/install21.sh' | bash -s -- --base "$BASE_DIR" --ggmlcuda 12 || { echo "❌ GaiaNet installation failed."; exit 1; }
 
     # Download and apply the configuration file
     echo "📥 Downloading configuration from $CONFIG_URL..."
