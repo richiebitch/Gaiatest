@@ -146,14 +146,14 @@ install_gaianet() {
         echo "✅ CUDA version detected: $CUDA_VERSION"
         if [[ "$CUDA_VERSION" == "11" || "$CUDA_VERSION" == "12" ]]; then
             echo "🔧 Installing GaiaNet with ggmlcuda $CUDA_VERSION..."
-            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.21/install.sh' -o install.sh
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.22/install.sh' -o install.sh
             chmod +x install.sh
             ./install.sh --ggmlcuda $CUDA_VERSION || { echo "❌ GaiaNet installation with CUDA failed."; exit 1; }
             return
         fi
     fi
     echo "⚠️ Installing GaiaNet without GPU support..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.20/install.sh' | bash || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/download/0.4.22/install.sh' | bash || { echo "❌ GaiaNet installation without GPU failed."; exit 1; }
 }
 
 # Add GaiaNet to PATH
