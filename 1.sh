@@ -200,18 +200,18 @@ SYSTEM_TYPE=$?  # Capture the return value of check_system_type
 
 if [[ $SYSTEM_TYPE -eq 0 ]]; then
     # VPS
-    CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Hyper_3.2-3B.json"
+    CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config.json"
 elif [[ $SYSTEM_TYPE -eq 1 ]]; then
     # Laptop
     if ! check_nvidia_gpu; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Hyper_3.2-3B.json"
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config.json"
     else
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Soneium2.5-0.5B.json"
     fi
 elif [[ $SYSTEM_TYPE -eq 2 ]]; then
     # Desktop
     if ! check_nvidia_gpu; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/Hyper_3.2-3B.json"
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config.json"
     else
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/gadao3.2_1B.json"
     fi
