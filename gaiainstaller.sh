@@ -211,14 +211,14 @@ echo "==============================================================="
 
                 # Determine the appropriate script based on system type
                 if check_if_vps_or_laptop; then
-                    script_name="gaiachat.sh"
+                    script_name="gaiachat1.sh"
                 else
                     if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
                         echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-                        script_name="gaiachat.sh"
+                        script_name="gaiachat1.sh"
                     else
                         echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-                        script_name="gaiachat.sh"
+                        script_name="gaiachat1.sh"
                     fi
                 fi
 
