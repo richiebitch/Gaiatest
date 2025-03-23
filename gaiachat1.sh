@@ -41,8 +41,8 @@ set_api_url() {
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://soneium.gaia.domains/v1/chat/completions"
-            API_NAME="Soneium"
+            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
+            API_NAME="Laptop gacrypto"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
