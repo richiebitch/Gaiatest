@@ -194,7 +194,7 @@ general_questions=(
     "What is the purpose of the United Nations?"
     "How does a compass work to show direction?"
 )
-    elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
   general_questions=(
     "What do you wear on your head when riding a bike?"
     "Which is the smallest country in the world by land area?"
