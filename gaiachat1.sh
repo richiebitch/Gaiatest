@@ -312,7 +312,7 @@ EOF
         fi
     else
         echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying."
-        sleep 5
+        sleep 10
     fi
 
     # Set sleep time based on API URL
