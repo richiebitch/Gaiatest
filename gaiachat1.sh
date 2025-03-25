@@ -418,7 +418,7 @@ fi
 # Display thread information
 echo "✅ Using 1 thread..."
 echo "⏳ Waiting 30 seconds before sending the first request..."
-sleep 5
+sleep 30
 
 echo "🚀 Starting requests..."
 start_time=$(date +%s)
