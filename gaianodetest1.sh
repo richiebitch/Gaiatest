@@ -120,18 +120,18 @@ set_config_url() {
     SYSTEM_TYPE=$?  # Capture the return value of check_system_type
 
     if [[ $SYSTEM_TYPE -eq 0 ]]; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+        CONFIG_URL="https://raw.githubusercontent.com/richiebitch/Gaia_Node/main/config2.json"
     elif [[ $SYSTEM_TYPE -eq 1 ]]; then
         if ! check_nvidia_gpu; then
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            CONFIG_URL="https://raw.githubusercontent.com/richiebitch/Gaia_Node/main/config2.json"
         else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+            CONFIG_URL="https://raw.githubusercontent.com/richiebitch/Gaia_Node/main/config1.json"
         fi
     elif [[ $SYSTEM_TYPE -eq 2 ]]; then
         if ! check_nvidia_gpu; then
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            CONFIG_URL="https://raw.githubusercontent.com/richiebitch/Gaia_Node/main/config2.json"
         else
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
+            CONFIG_URL="https://raw.githubusercontent.com/richiebitch/Gaia_Node/main/config3.json"
         fi
     fi
     echo "🔗 Using configuration: $CONFIG_URL"
