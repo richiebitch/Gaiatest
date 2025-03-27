@@ -63,6 +63,6 @@ if [ -f "$INSTALLER" ]; then
 fi
 
 echo "Downloading latest Gaia installer script..."
-curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh
+curl -O https://raw.githubusercontent.com/richiebitch/Gaiatest/main/gaiainstaller.sh
 chmod +x "$INSTALLER"
 ./"$INSTALLER"
