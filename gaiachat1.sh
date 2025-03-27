@@ -41,8 +41,8 @@ set_api_url() {
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="Laptop gacrypto"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
+            API_NAME="Laptop brain"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
@@ -50,8 +50,8 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gacrypto.gaia.domains/v1/chat/completions"
-            API_NAME="gacrypto"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
+            API_NAME="brain"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
@@ -121,7 +121,7 @@ general_questions=(
     "How does statistics help in making informed decisions?"
 )
 
-    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
 general_questions=(
     "How do vaccines work to protect against diseases?"
     "What are black holes, and why are they important in astronomy?"
@@ -194,7 +194,7 @@ general_questions=(
     "What is the purpose of the United Nations?"
     "How does a compass work to show direction?"
 )
-    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
   general_questions=(
    "How do vaccines work to protect against diseases?"
     "What are black holes, and why are they important in astronomy?"
@@ -322,7 +322,7 @@ EOF
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching (soneium API)..."
         sleep 2
-    elif [[ "$API_URL" == "https://gacrypto.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching..."
         sleep 1
     fi
