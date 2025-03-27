@@ -898,7 +898,7 @@ case $choice in
             echo "🚀 Starting chatbot in a detached screen session..."
             screen -dmS gaiabot bash -c '
             echo "🔍 Starting chatbot script..."
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+            curl -O https://raw.githubusercontent.com/richiebitch/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
             if [ -f "'"$script_name"'" ]; then
                 echo "🔍 Executing chatbot script..."
                 ./'"$script_name"'
