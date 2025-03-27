@@ -50,8 +50,8 @@ set_api_url() {
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
-            API_NAME="gadao"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
+            API_NAME="brain"
         else
             API_URL="https://hyper.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
@@ -80,7 +80,7 @@ fi
 
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
-    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
+    if [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
 general_questions=(
     "Why is the Renaissance considered a turning point in history?"
     "How did the Industrial Revolution change the world?"
@@ -121,7 +121,7 @@ general_questions=(
     "How does statistics help in making informed decisions?"
 )
 
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
 general_questions=(
     "What do you wear on your head when riding a bike?"
     "Which is the smallest country in the world by land area?"
@@ -173,7 +173,7 @@ general_questions=(
     "What is the purpose of the United Nations?"
     "How does a compass work to show direction?"
 )
-    elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
   general_questions=(
     "What do you wear on your head when riding a bike?"
     "Which is the smallest country in the world by land area?"
@@ -280,7 +280,7 @@ EOF
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching (soneium API)..."
         sleep 2
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Fetching..."
         sleep 1
     fi
