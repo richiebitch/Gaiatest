@@ -135,9 +135,7 @@ echo "==============================================================="
             ;;
 
         4)
-            # Terminate any existing 'gaiabot' screen sessions before starting a new one
-            echo "🔴 Terminating any existing 'gaiabot' screen sessions..."
-            screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
+         
 
             # Function to check if a port is active
             check_port() {
