@@ -194,8 +194,7 @@ echo "==============================================================="
 
                 sleep 5
                 screen -r gaiabot
-            fi
-            ;;
+          
 
         5)
             # Function to list active screen sessions and allow user to select one
