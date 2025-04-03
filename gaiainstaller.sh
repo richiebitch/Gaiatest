@@ -163,49 +163,10 @@ echo "==============================================================="
             # Main script logic
             echo "Detecting system configuration..."
 
-            # Check if GaiaNet is installed
-            if ! command -v ~/gaianet/bin/gaianet &> /dev/null; then
-                echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
-                echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-                read -r -p "Press Enter to return to the main menu..."
-                continue
-            fi
+         
 
-            # Check if GaiaNet is installed properly
-            gaianet_info=$( ~/gaianet/bin/gaianet info 2>/dev/null )
-            if [[ -z "$gaianet_info" ]]; then
-                echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
-                echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
-                echo -e "\e[1;33m🔍 Run: \e[1;33m'go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
-                read -r -p "Press Enter to return to the main menu..."
-                continue
-            fi
 
-            # Proceed if GaiaNet is properly installed
-            if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
-
-                # Check if at least one of the ports is active
-                ports=(8080 8081 8082 8083)
-                at_least_one_port_active=0
-
-                echo -e "\e[1;34m🔍 Checking ports...\e[0m"
-                for port in "${ports[@]}"; do
-                    if check_port $port; then
-                        at_least_one_port_active=$((at_least_one_port_active + 1))
-                    fi
-                done
-
-                # If none of the ports are active, provide additional instructions
-                if [ $at_least_one_port_active -eq 0 ]; then
-                    echo -e "\e[1;31m❌ No active ports found.\e[0m"
-                    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-                    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-                    read -r -p "Press Enter to return to the main menu..."
-                    continue
-                fi
-
-                echo -e "\e[1;32m🎉 At least one port is active. GaiaNet node is running.\e[0m"
+          
 
                 # Determine the appropriate script based on system type
                 if check_if_vps_or_laptop; then
